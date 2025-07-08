@@ -1,9 +1,10 @@
-﻿using AdamMIS.Contract.Authentications;
+﻿
 
 namespace AdamMIS.Services.AuthServices
 {
     public interface IAuthService
     {
-        Task<AuthResponse> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default);
+        Task<Result<AuthResponse>> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default);
+        Task<Result<AuthResponse>> RigesterAsync(RegisterRequest request, CancellationToken cancellationToken = default);
     }
 }

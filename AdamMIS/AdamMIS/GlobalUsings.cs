@@ -13,8 +13,10 @@ global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 global using AdamMIS.Entities;
 global using AdamMIS;
 global using AdamMIS.Data;
-
-
+global using AdamMIS.Abstractions.Consts;
+global using Error = AdamMIS.Abstractions.Error;
+global using AdamMIS.Abstractions;
+global using AdamMIS.Contract.Authentications;
 
 
 

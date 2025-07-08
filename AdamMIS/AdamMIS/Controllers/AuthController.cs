@@ -16,19 +16,31 @@ namespace AdamMIS.Controllers
         }
         [HttpPost("")]
 
-        public async Task<IActionResult> LoginAsync(LoginRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Login(LoginRequest request, CancellationToken cancellationToken)
         {
 
-            var authResult = await _authService.GetTokenAsync(request.Email, request.Password, cancellationToken);
+            var authResult = await _authService.GetTokenAsync(request.UserName, request.Password, cancellationToken);
 
-            if (authResult == null)
+            if (authResult.IsFailure)
             {
-                return BadRequest("Invalid Email/Password");
+                return Problem(statusCode: StatusCodes.Status400BadRequest,title:authResult.Error.Code,detail:authResult.Error.Description);
             }
 
 
 
-            return Ok(authResult);
+            return Ok(authResult.Value);
+        }
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(RegisterRequest request, CancellationToken cancellationToken = default)
+        {
+            var authResult = await _authService.RigesterAsync(request, cancellationToken);
+            if (authResult.IsFailure)
+            {
+                return Problem(statusCode: StatusCodes.Status400BadRequest, title: authResult.Error.Code, detail: authResult.Error.Description);
+            }
+            else
+                return Ok(authResult.Value);
+
         }
 
 

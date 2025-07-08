@@ -3,6 +3,7 @@
 
 
 
+using Microsoft.AspNetCore.Identity;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,24 +17,10 @@ var connectionstring = builder.Configuration.GetConnectionString("MyConnection")
 
 // Add EF Core with Identity support
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionstring));
-
-//builder.Services.AddIdentityApiEndpoints<ApplicationUser>(options =>
-//{
-//    options.Password.RequireDigit = true;
-//    options.Password.RequiredLength = 4;
-//    options.Password.RequireNonAlphanumeric = false;
-//    options.Password.RequireUppercase = false;
-//    options.Password.RequireLowercase = false;
+    options.UseSqlServer(connectionstring)
+           .LogTo(Console.WriteLine, LogLevel.Information));
 
 
-//    options.User.RequireUniqueEmail = false;
-//    options.SignIn.RequireConfirmedEmail = false;
-//    options.SignIn.RequireConfirmedAccount = false;
-
-
-//})
-//.AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddDependency(builder.Configuration);
 
 // This builder use for generate logging file
