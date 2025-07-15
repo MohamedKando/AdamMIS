@@ -17,12 +17,23 @@ var connectionstring = builder.Configuration.GetConnectionString("MyConnection")
 
 // Add EF Core with Identity support
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionstring)
-           .LogTo(Console.WriteLine, LogLevel.Information));
+    options.UseSqlServer(connectionstring, sqlOptions =>
+    {
+        sqlOptions.CommandTimeout(90); // default is 30
+       // sqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+    })
+    .LogTo(Console.WriteLine, LogLevel.Information));
+
 
 
 builder.Services.AddDependency(builder.Configuration);
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod());
+});
 // This builder use for generate logging file
 builder.Host.UseSerilog((context, configuration) =>
 {
@@ -42,7 +53,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
-
+app.UseCors("AllowAll");
 app.UseAuthorization();
 //app.MapIdentityApi<ApplicationUser>();
 app.MapControllers();

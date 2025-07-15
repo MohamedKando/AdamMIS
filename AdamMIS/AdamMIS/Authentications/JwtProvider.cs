@@ -61,7 +61,7 @@ namespace AdamMIS.Authentications
             }
             catch
             {
-                return null;
+                return null!;
             }
         }
     }

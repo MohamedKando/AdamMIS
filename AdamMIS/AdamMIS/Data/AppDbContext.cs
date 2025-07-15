@@ -1,6 +1,8 @@
 ﻿
 
 
+using AdamMIS.Entities.ReportsEnitites;
+
 namespace AdamMIS.Data
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
@@ -10,7 +12,10 @@ namespace AdamMIS.Data
             
         }
 
-       
+        public DbSet<RCategories> RCategories { get; set; }
+        public DbSet<Reports> Reports { get; set; }
+        public DbSet<UserReports> UserReports { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="07/12/2025 19:46:48" ReportInfo.Modified="07/12/2025 20:26:21" ReportInfo.CreatorVersion="2025.2.6.0">
+	<Dictionary>
+		<BusinessObjectDataSource Name="Test" ReferenceName="Test" DataType="System.Int32" Enabled="true">
+			<Column Name="FirstName" DataType="System.String"/>
+			<Column Name="LastName" DataType="System.String"/>
+			<Column Name="Age" DataType="System.Int32"/>
+		</BusinessObjectDataSource>
+	</Dictionary>
+	<ReportPage Name="Page1" Watermark.Font="Arial, 60pt" PaperWidth="210" PaperHeight="297" RawPaperSize="9" LeftMargin="10" TopMargin="10" RightMargin="10" BottomMargin="10">
+
+		<!-- Enhanced Report Title Band with gradient background -->
+		<ReportTitleBand Name="ReportTitle1" Width="718.2" Height="60" Fill.Color="DarkSlateBlue" Border.Lines="All" Border.Color="Navy" Border.Width="2">
+			<TextObject Name="Text1" Left="0" Top="15" Width="718.2" Height="30" Text="EMPLOYEE INFORMATION REPORT" HorzAlign="Center" VertAlign="Center" Font="Arial, 16pt, style=Bold" TextFill.Color="White"/>
+			<LineObject Name="Line1" Left="50" Top="50" Width="618.2" Height="0" Border.Color="White" Border.Width="1"/>
+		</ReportTitleBand>
+
+		<!-- Enhanced Page Header with professional styling -->
+		<PageHeaderBand Name="PageHeader1" Top="64" Width="718.2" Height="45" Fill.Color="LightSteelBlue" Border.Lines="All" Border.Color="SteelBlue" Border.Width="1">
+			<TextObject Name="Text3" Left="60" Top="12" Width="200" Height="25" Text="FIRST NAME" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold" TextFill.Color="DarkSlateBlue" Border.Lines="Right" Border.Color="SteelBlue" Border.Width="1"/>
+			<TextObject Name="Text5" Left="260" Top="12" Width="200" Height="25" Text="LAST NAME" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold" TextFill.Color="DarkSlateBlue" Border.Lines="Right" Border.Color="SteelBlue" Border.Width="1"/>
+			<TextObject Name="Text7" Left="460" Top="12" Width="200" Height="25" Text="AGE" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold" TextFill.Color="DarkSlateBlue"/>
+		</PageHeaderBand>
+
+		<!-- Enhanced Data Band with alternating row colors -->
+		<DataBand Name="Data1" Top="113" Width="718.2" Height="35" DataSource="Test"
+				 Fill.Color="IIf(Row % 2 == 0, 'White', 'AliceBlue')"
+				 Border.Lines="All" Border.Color="LightGray" Border.Width="0.5">
+
+			<TextObject Name="Text2" Left="60" Top="5" Width="200" Height="25" Text="[Test.FirstName]" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt" TextFill.Color="DarkSlateGray" Border.Lines="Right" Border.Color="LightGray" Border.Width="0.5"/>
+			<TextObject Name="Text4" Left="260" Top="5" Width="200" Height="25" Text="[Test.LastName]" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt" TextFill.Color="DarkSlateGray" Border.Lines="Right" Border.Color="LightGray" Border.Width="0.5"/>
+			<TextObject Name="Text6" Left="460" Top="5" Width="200" Height="25" Text="[Test.Age]" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt" TextFill.Color="DarkSlateGray"/>
+		</DataBand>
+
+		<!-- Enhanced Page Footer with modern styling -->
+		<PageFooterBand Name="PageFooter1" Top="152" Width="718.2" Height="50" Fill.Color="WhiteSmoke" Border.Lines="Top" Border.Color="Gray" Border.Width="1">
+			<TextObject Name="Text10" Left="60" Top="15" Width="200" Height="20" Text="Generated on: [Date]" Font="Arial, 9pt, style=Italic" TextFill.Color="Gray"/>
+			<TextObject Name="Text11" Left="460" Top="15" Width="200" Height="20" Text="Page [Page] of [TotalPages]" HorzAlign="Right" Font="Arial, 9pt, style=Italic" TextFill.Color="Gray"/>
+			<LineObject Name="Line2" Left="60" Top="5" Width="600" Height="0" Border.Color="Gray" Border.Width="0.5"/>
+		</PageFooterBand>
+
+
+
+	</ReportPage>
+</Report>

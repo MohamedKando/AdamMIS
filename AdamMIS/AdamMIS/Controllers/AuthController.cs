@@ -42,7 +42,20 @@ namespace AdamMIS.Controllers
                 return Ok(authResult.Value);
 
         }
+        [HttpDelete("ClearAll")]
+        public async Task<IActionResult> ClearUsers(CancellationToken cancellationToken)
+        {
 
+            var result = await _authService.ClearAllUsersAsync(cancellationToken);
 
+            if (result.IsFailure)
+            {
+                return Problem(statusCode: StatusCodes.Status404NotFound, title: result.Error.Code, detail: result.Error.Description);
+
+            }
+            else
+                return NoContent();
+
+        }
     }
 }

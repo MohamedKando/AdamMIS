@@ -2,6 +2,7 @@
 using AdamMIS.Contract.Authentications;
 using AdamMIS.Errors;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace AdamMIS.Services.AuthServices
 {
@@ -9,10 +10,12 @@ namespace AdamMIS.Services.AuthServices
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IJwtProvider _jwtProvider;
-        public AuthService(UserManager<ApplicationUser> userManager, IJwtProvider jwtProvider)
+        private readonly AppDbContext _context;
+        public AuthService(UserManager<ApplicationUser> userManager, IJwtProvider jwtProvider, AppDbContext context)
         {
             _userManager = userManager;
             _jwtProvider = jwtProvider;
+            _context = context;
         }
         public async Task<Result<AuthResponse>> GetTokenAsync(string name, string password, CancellationToken cancellationToken = default)
         {
@@ -27,7 +30,7 @@ namespace AdamMIS.Services.AuthServices
             var isValidPassword =await _userManager.CheckPasswordAsync(user, password);
             if (isValidPassword == false)
             {
-                Result.Failure<AuthResponse>(UserErrors.UserInvalidCredentials);
+             return Result.Failure<AuthResponse>(UserErrors.UserInvalidCredentials);
             }
 
             //generate jwt 
@@ -69,5 +72,16 @@ namespace AdamMIS.Services.AuthServices
             var error = result.Errors.First();
             return Result.Failure<AuthResponse>(new Error (error.Code,error.Description));
         }
+        public async Task<Result> ClearAllUsersAsync(CancellationToken cancellationToken)
+        {
+            // 1. Delete all users
+            await _context.Database.ExecuteSqlRawAsync("DELETE FROM [AspNetUsers]", cancellationToken);
+
+            // 2. Reset identity seed (to start from 1)
+            
+
+            return Result.Success();
+        }
+
     }
 }

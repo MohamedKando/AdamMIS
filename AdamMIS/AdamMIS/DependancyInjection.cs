@@ -1,5 +1,6 @@
 ﻿using AdamMIS.Authentications;
 using AdamMIS.Services.AuthServices;
+using AdamMIS.Services.ReportsServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -20,6 +21,7 @@ namespace AdamMIS
                    
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtProvider, JwtProvider>();
+            services.AddScoped<IReportService, ReportService>();
             services.AddProblemDetails();
             return services;
         }
@@ -76,7 +78,7 @@ namespace AdamMIS
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtSettings?.Key!)),
-                    ValidAudience = JwtSettings.Audience,
+                    ValidAudience = JwtSettings!.Audience,
                     ValidIssuer = JwtSettings.Issuer
 
                 };
@@ -84,7 +86,7 @@ namespace AdamMIS
             services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequireDigit = true;
-                options.Password.RequiredLength = 8;
+                options.Password.RequiredLength = 4;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequireLowercase = false;

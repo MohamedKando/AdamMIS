@@ -2,7 +2,7 @@
 {
     public static class RegexPatterns
     {
-        public const string Password = "^(?=.*\\d).{8,}$";
+        public const string Password = "^(?=.*\\d).{4,}$";
 
     }
 }
