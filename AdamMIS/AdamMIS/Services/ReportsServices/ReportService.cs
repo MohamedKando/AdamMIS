@@ -1,5 +1,6 @@
 ﻿using AdamMIS.Contract.Reports;
 using AdamMIS.Entities.ReportsEnitites;
+using FastReport.Barcode;
 
 namespace AdamMIS.Services.ReportsServices
 {
@@ -62,9 +63,17 @@ namespace AdamMIS.Services.ReportsServices
         {
             throw new NotImplementedException();
         }
-        public Task<bool> DeleteCategoryAsync(int id)
+        public async Task<bool> DeleteCategoryAsync(int id)
         {
-            throw new NotImplementedException();
+            var entity = await _context.RCategories.FindAsync(id);
+            if (entity == null)
+            {
+                return false;
+            }
+
+            _context.RCategories.Remove(entity);
+            await _context.SaveChangesAsync();
+            return true;
         }
         public async Task<IEnumerable<RCategoryResponse>> GetAllCategoriesAsync()
         {

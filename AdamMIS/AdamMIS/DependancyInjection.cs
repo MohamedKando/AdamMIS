@@ -1,6 +1,7 @@
 ﻿using AdamMIS.Authentications;
 using AdamMIS.Services.AuthServices;
 using AdamMIS.Services.ReportsServices;
+using AdamMIS.Services.UsersServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -22,6 +23,7 @@ namespace AdamMIS
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtProvider, JwtProvider>();
             services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddProblemDetails();
             return services;
         }
