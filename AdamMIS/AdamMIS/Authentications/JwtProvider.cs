@@ -20,6 +20,7 @@ namespace AdamMIS.Authentications
             Claim[] claims = [
 
                 new(JwtRegisteredClaimNames.Sub, user.Id),
+                new(ClaimTypes.Name,user.UserName!),
                
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             ];

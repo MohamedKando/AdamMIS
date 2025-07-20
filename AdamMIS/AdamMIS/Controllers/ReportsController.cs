@@ -183,7 +183,7 @@ namespace AdamMIS.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var createdBy = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "Unknown";
+                var createdBy = User.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
                 var report = await _reportService.UploadReportAsync(request, createdBy);
 
                 return CreatedAtAction(nameof(GetReportById), new { id = report.Id }, report);
@@ -232,7 +232,7 @@ namespace AdamMIS.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var assignedBy = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "Unknown";
+                var assignedBy = User.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
                 var assignments = await _reportService.AssignReportsToUsersAsync(request, assignedBy);
 
                 return Ok(assignments);
