@@ -34,7 +34,8 @@ namespace AdamMIS.Services.AuthServices
             }
 
             //generate jwt 
-            var (token, expireIn) = _jwtProvider.GenerateToken(user);
+            var (userRoles, userPermissions) = await GetUserRolesAndPermissions(user);
+            var (token, expireIn) = _jwtProvider.GenerateToken(user, userRoles, userPermissions!);
 
             // returning the response
 
@@ -67,6 +68,7 @@ namespace AdamMIS.Services.AuthServices
                     Id = user.Id,
                     UserName = request.UserName
                 };
+                await _userManager.AddToRoleAsync(user, DeafultRole.Member);
                 return  Result.Success(response);
             }
             var error = result.Errors.First();
@@ -81,6 +83,15 @@ namespace AdamMIS.Services.AuthServices
             
 
             return Result.Success();
+        }
+        private async Task<(IEnumerable<string>roles,IEnumerable<string> permissions)> GetUserRolesAndPermissions(ApplicationUser user)
+        {
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var userPermissions = await _context.Roles
+                .Join(_context.RoleClaims,role=>role.Id,claim=>claim.RoleId,(role,claim)=>new {role,claim})
+                .Where(x=>userRoles.Contains(x.role.Name!)).Select(x=>x.claim.ClaimValue).Distinct().ToListAsync();
+            return (userRoles,userPermissions!);
         }
 
     }

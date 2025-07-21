@@ -4,6 +4,7 @@ using AdamMIS.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdamMIS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250721100512_UpdateRolesTable")]
+    partial class UpdateRolesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,24 +53,6 @@ namespace AdamMIS.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "35904F06-0FD5-47F3-ACF2-23B77C14F947",
-                            ConcurrencyStamp = "F851A5D6-1A5C-48BA-8C07-23DD5239319B",
-                            IsDeafult = false,
-                            Name = "SuperAdmin",
-                            NormalizedName = "SUPERADMIN"
-                        },
-                        new
-                        {
-                            Id = "7DFA4DBB-644A-4759-BC51-FB23455DB7C1",
-                            ConcurrencyStamp = "62263B17-1587-4F52-9077-976245E626EA",
-                            IsDeafult = true,
-                            Name = "Member",
-                            NormalizedName = "MEMBER"
-                        });
                 });
 
             modelBuilder.Entity("AdamMIS.Entities.ApplicationUser", b =>
@@ -91,13 +76,11 @@ namespace AdamMIS.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -143,24 +126,6 @@ namespace AdamMIS.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "03174B27-D47B-4C12-94AD-676B3BF14BC2",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "07C2800E-4457-4360-8102-A99EC489446D",
-                            EmailConfirmed = true,
-                            FirstName = "",
-                            LastName = "",
-                            LockoutEnabled = false,
-                            NormalizedUserName = "MOHAMEDKANDO",
-                            PasswordHash = "AQAAAAIAAYagAAAAEB3jiNdDXPnqEtU7ce5yMXdYBDecRPmpJvdTuiKQ3/A56NhzBSRVtyse04xc2sc3/w==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "75B0F3ACD7DE4D088DA0594E3ACDC1EF",
-                            TwoFactorEnabled = false,
-                            UserName = "MohamedKando"
-                        });
                 });
 
             modelBuilder.Entity("AdamMIS.Entities.ReportsEnitites.RCategories", b =>
@@ -285,127 +250,6 @@ namespace AdamMIS.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ClaimType = "permissions",
-                            ClaimValue = "auth:add",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ClaimType = "permissions",
-                            ClaimValue = "user:delete",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ClaimType = "permissions",
-                            ClaimValue = "user:update",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ClaimType = "permissions",
-                            ClaimValue = "user:read",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ClaimType = "permissions",
-                            ClaimValue = "report:read",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            ClaimType = "permissions",
-                            ClaimValue = "report:add",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            ClaimType = "permissions",
-                            ClaimValue = "report:update",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            ClaimType = "permissions",
-                            ClaimValue = "report:delete",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            ClaimType = "permissions",
-                            ClaimValue = "category:read",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            ClaimType = "permissions",
-                            ClaimValue = "category:add",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            ClaimType = "permissions",
-                            ClaimValue = "category:update",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            ClaimType = "permissions",
-                            ClaimValue = "category:delete",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 13,
-                            ClaimType = "permissions",
-                            ClaimValue = "roles:read",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 14,
-                            ClaimType = "permissions",
-                            ClaimValue = "roles:add",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 15,
-                            ClaimType = "permissions",
-                            ClaimValue = "Roles:update",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 16,
-                            ClaimType = "permissions",
-                            ClaimValue = "Roles:delete",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        },
-                        new
-                        {
-                            Id = 17,
-                            ClaimType = "permissions",
-                            ClaimValue = "results:read",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -468,13 +312,6 @@ namespace AdamMIS.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "03174B27-D47B-4C12-94AD-676B3BF14BC2",
-                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>

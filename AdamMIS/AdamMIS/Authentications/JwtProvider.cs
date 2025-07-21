@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Azure.Core.Serialization;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 
 namespace AdamMIS.Authentications
 {
@@ -15,13 +17,14 @@ namespace AdamMIS.Authentications
             _jwtOptions = jwtOptions.Value;
 
         }
-        public (string token, int expiresIn) GenerateToken(ApplicationUser user)
+        public (string token, int expiresIn) GenerateToken(ApplicationUser user,IEnumerable<string> roles, IEnumerable<string> permissions)
         {
             Claim[] claims = [
 
                 new(JwtRegisteredClaimNames.Sub, user.Id),
                 new(ClaimTypes.Name,user.UserName!),
-               
+                new(nameof(roles), JsonSerializer.Serialize(roles),JsonClaimValueTypes.JsonArray),
+               new(nameof(roles), JsonSerializer.Serialize(permissions),JsonClaimValueTypes.JsonArray),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             ];
 

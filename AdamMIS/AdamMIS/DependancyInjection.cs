@@ -62,7 +62,7 @@ namespace AdamMIS
             // the difference between it and the previuse line is the second line validate the data using dataannotation
             //services.AddOptions<JwtOptions>().BindConfiguration("Jwt").ValidateDataAnnotations().ValidateOnStart();
             var JwtSettings = configuration.GetSection("Jwt").Get<JwtOptions>();
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<AppDbContext>();
 
             services.AddAuthentication(options =>

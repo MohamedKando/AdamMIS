@@ -5,7 +5,7 @@ using AdamMIS.Entities.ReportsEnitites;
 
 namespace AdamMIS.Data
 {
-    public class AppDbContext : IdentityDbContext<ApplicationUser>
+    public class AppDbContext : IdentityDbContext<ApplicationUser , ApplicationRole,string>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
