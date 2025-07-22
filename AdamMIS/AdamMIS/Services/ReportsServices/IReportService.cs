@@ -35,7 +35,8 @@ namespace AdamMIS.Services.ReportsServices
         //// File Management
         //Task<byte[]?> GetReportFileAsync(int reportId);
         //Task<string?> GetReportFilePathAsync(int reportId);
-        Task<Result> ClearAllUsersAsync(CancellationToken cancellationToken);
+        Task<Result> ClearAllReportsAsync(CancellationToken cancellationToken);
+
         }
     
 }

@@ -24,7 +24,7 @@ namespace AdamMIS.Authentications
                 new(JwtRegisteredClaimNames.Sub, user.Id),
                 new(ClaimTypes.Name,user.UserName!),
                 new(nameof(roles), JsonSerializer.Serialize(roles),JsonClaimValueTypes.JsonArray),
-               new(nameof(roles), JsonSerializer.Serialize(permissions),JsonClaimValueTypes.JsonArray),
+                new(nameof(permissions), JsonSerializer.Serialize(permissions),JsonClaimValueTypes.JsonArray),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             ];
 

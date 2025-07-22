@@ -1,4 +1,5 @@
-﻿using AdamMIS.Contract.Reports;
+﻿using AdamMIS.Authentications.Filters;
+using AdamMIS.Contract.Reports;
 using AdamMIS.Entities.ReportsEnitites;
 using FastReport.Barcode;
 
@@ -336,8 +337,8 @@ namespace AdamMIS.Services.ReportsServices
 
 
 
-
-        public async Task<Result> ClearAllUsersAsync(CancellationToken cancellationToken)
+        
+        public async Task<Result> ClearAllReportsAsync(CancellationToken cancellationToken)
         {
             // 1. Delete all users
             await _context.Database.ExecuteSqlRawAsync("DELETE FROM [Reports]", cancellationToken);

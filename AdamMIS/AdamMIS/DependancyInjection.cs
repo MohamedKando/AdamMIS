@@ -1,8 +1,10 @@
 ﻿using AdamMIS.Authentications;
+using AdamMIS.Authentications.Filters;
 using AdamMIS.Services.AuthServices;
 using AdamMIS.Services.ReportsServices;
 using AdamMIS.Services.UsersServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -64,6 +66,9 @@ namespace AdamMIS
             var JwtSettings = configuration.GetSection("Jwt").Get<JwtOptions>();
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<AppDbContext>();
+
+            services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
+            services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
             services.AddAuthentication(options =>
             {

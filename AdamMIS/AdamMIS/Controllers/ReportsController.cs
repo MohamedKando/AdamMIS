@@ -1,5 +1,6 @@
 ﻿
 
+using AdamMIS.Authentications.Filters;
 using AdamMIS.Contract.Reports;
 using AdamMIS.Services.ReportsServices;
 using FastReport;
@@ -176,6 +177,7 @@ namespace AdamMIS.Controllers
 
 
         [HttpPost("reports/upload")]
+        [HasPermission(Permissions.UpdateReports)]
         public async Task<ActionResult<ReportResponse>> UploadReport([FromForm] ReportRequest request)
         {
             try
@@ -201,6 +203,7 @@ namespace AdamMIS.Controllers
 
 
         [HttpDelete("reports/{id}")]
+        [HasPermission(Permissions.DeleteReports)]
         public async Task<ActionResult> DeleteReport(int id)
         {
             try
@@ -459,10 +462,11 @@ namespace AdamMIS.Controllers
 
 
         [HttpDelete("ClearAll")]
+        [HasPermission(Permissions.DeleteReports)]
         public async Task<IActionResult> ClearUsers(CancellationToken cancellationToken)
         {
 
-            var result = await _reportService.ClearAllUsersAsync(cancellationToken);
+            var result = await _reportService.ClearAllReportsAsync(cancellationToken);
 
             if (result.IsFailure)
             {
