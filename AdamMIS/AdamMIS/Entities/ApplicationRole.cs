@@ -4,6 +4,7 @@ namespace AdamMIS.Entities
 {
     public class ApplicationRole : IdentityRole
     {
+        public bool IsDeleted { get; set; } = false;
         public bool IsDeafult { get; set; }
     }
 }

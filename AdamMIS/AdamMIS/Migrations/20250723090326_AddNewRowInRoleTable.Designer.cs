@@ -4,6 +4,7 @@ using AdamMIS.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdamMIS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250723090326_AddNewRowInRoleTable")]
+    partial class AddNewRowInRoleTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,7 +163,7 @@ namespace AdamMIS.Migrations
                             LastName = "",
                             LockoutEnabled = false,
                             NormalizedUserName = "MOHAMEDKANDO",
-                            PasswordHash = "AQAAAAIAAYagAAAAEE8JHqSmvEUm16FChMSTYfOo4dIJolHmXOvVahvgkSED/PxeOqxPRgG82Mr2EPelcQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHuJdFMo4NmM/DNlx8QkM8/rF0PEIV5BYBmUqLxihwCYWEn+B4z9ou3DYHPeLGI81A==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "75B0F3ACD7DE4D088DA0594E3ACDC1EF",
                             TwoFactorEnabled = false,
