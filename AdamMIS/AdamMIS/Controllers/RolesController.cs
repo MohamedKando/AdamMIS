@@ -1,6 +1,8 @@
-﻿using AdamMIS.Contract.Roles;
+﻿using AdamMIS.Authentications.Filters;
+using AdamMIS.Contract.Roles;
 using AdamMIS.Services.RolesServices;
 using Azure;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AdamMIS.Controllers
 {
@@ -50,12 +52,30 @@ namespace AdamMIS.Controllers
             return Ok(result);
         }
 
+        [HttpGet("permissions")]
+        public ActionResult<IList<string>> GetAvailablePermissions()
+        {
+            try
+            {
+                var permissions = Permissions.GetAllPermissions();
+                return Ok(permissions);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, "Failed to retrieve permissions");
+            }
+        }
+
         [HttpPut("Toggle/{id}")]
+        [HasPermission(Permissions.DeleteRoles)]
         public async Task<IActionResult> ToggleRole([FromRoute] string id)
         {
             var result = await _roleService.ToggleStatusAsync(id);
             
             return Ok(result);
         }
+
+
     }
 }

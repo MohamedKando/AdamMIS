@@ -124,6 +124,7 @@ namespace AdamMIS.Controllers
         //#region Report Management
 
         [HttpGet("reports")]
+        
         public async Task<ActionResult<IEnumerable<ReportResponse>>> GetAllReports()
         {
             try
@@ -268,6 +269,7 @@ namespace AdamMIS.Controllers
 
 
         [HttpGet("user-reports/user/{userId}")]
+        //[HasPermission(Permissions.ReadReports)]
         public async Task<ActionResult<IEnumerable<UserReportResponse>>> GetUserReports(string userId)
         {
             try

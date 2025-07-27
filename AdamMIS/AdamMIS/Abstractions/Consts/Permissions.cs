@@ -5,36 +5,38 @@
         public static string Type { get; } = "permissions";
 
         //User Permissions
-        public const string RegisterUsers = "auth:add";
-        public const string DeleteUsers = "user:delete";
-        public const string UpdateUsers = "user:update";
-        public const string ReadUsers = "user:read";
+        public const string RegisterUsers = "Register Users";
+        public const string DeleteUsers = "Delete Users";
+        public const string UpdateUsers = "Update Users";
+        public const string ReadUsers = "Read Users";
 
 
         //Report Permissions
-        public const string ReadReports = "report:read";
-        public const string AddReports = "report:add";
-        public const string UpdateReports = "report:update";
-        public const string DeleteReports = "report:delete";
+        public const string ReadReports = "Read Reports";
+        public const string AddReports = "Add Reports";
+        public const string UpdateReports = "Update Reports";
+        public const string DeleteReports = "Delete Reports";
         
         
         //Category Permissions
-        public const string ReadCategories = "category:read";
-        public const string AddCategories = "category:add";
-        public const string UpdateCategories = "category:update";
-        public const string DeleteCategories = "category:delete";
+        public const string ReadCategories = "Read Categories";
+        public const string AddCategories = "Add Categories";
+        public const string UpdateCategories = "Update Categories";
+        public const string DeleteCategories = "Delete Categories";
 
         //Roles Permissions
-        public const string ReadRoles = "roles:read";
-        public const string AddRoles = "roles:add";
-        public const string UpdateRoles = "Roles:update";
-        public const string DeleteRoles = "Roles:delete";
+        public const string ReadRoles = "Read Roles";
+        public const string AddRoles = "Add Roles";
+        public const string UpdateRoles = "Update Roles";
+        public const string DeleteRoles = "Delete Roles";
 
-        public const string Result = "results:read";
+
+
+        public const string Result = "Read Result";
 
 
         //View Permisstions
-        public const string ViewReportManager = "view:reportmanager";
+        public const string ViewReportManager = "View Report Manager";
 
         public static IList<string?> GetAllPermissions()
         {

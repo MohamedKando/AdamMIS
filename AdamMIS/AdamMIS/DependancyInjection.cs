@@ -90,6 +90,7 @@ namespace AdamMIS
                     ValidAudience = JwtSettings!.Audience,
                     ValidIssuer = JwtSettings.Issuer
 
+
                 };
             });
             services.Configure<IdentityOptions>(options =>
