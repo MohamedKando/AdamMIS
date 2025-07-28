@@ -3,6 +3,7 @@
 
 
 
+using AdamMIS.Authentications.Filters;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
 
@@ -42,7 +43,11 @@ builder.Host.UseSerilog((context, configuration) =>
 );
 var app = builder.Build();
 
-
+using (var scope = app.Services.CreateScope())
+{
+    var permissionSeeder = scope.ServiceProvider.GetRequiredService<PermissionsSeeder>();
+    await permissionSeeder.SeedPermissionsAsync();
+}
 
 
 // Configure the HTTP request pipeline.

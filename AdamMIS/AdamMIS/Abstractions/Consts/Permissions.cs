@@ -32,6 +32,7 @@
 
 
 
+
         public const string Result = "Read Result";
 
 
@@ -41,7 +42,11 @@
         public static IList<string?> GetAllPermissions()
         {
 
-            return typeof(Permissions).GetFields().Select(field =>field.GetValue(field) as string).ToList();
+            return typeof(Permissions)
+            .GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.FlattenHierarchy)
+            .Where(fi => fi.IsLiteral && !fi.IsInitOnly && fi.FieldType == typeof(string))
+            .Select(fi => fi.GetRawConstantValue() as string)
+            .ToList();
         }
     }
 }

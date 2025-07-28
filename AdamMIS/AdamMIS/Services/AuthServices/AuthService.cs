@@ -25,6 +25,10 @@ namespace AdamMIS.Services.AuthServices
             {
                 return Result.Failure<AuthResponse>(UserErrors.UserInvalidCredentials);
             }
+            if (user.IsDisabled)
+            {
+                return Result.Failure<AuthResponse>(UserErrors.UserDisabled);
+            }
             // check password 
 
             var isValidPassword =await _userManager.CheckPasswordAsync(user, password);

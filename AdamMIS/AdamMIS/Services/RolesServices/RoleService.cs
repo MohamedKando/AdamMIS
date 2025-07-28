@@ -17,7 +17,7 @@ namespace AdamMIS.Services.RolesServices
 
         public async Task<IEnumerable<RolesResponse>> GetAllAsync(bool? includeDisabled = false)
         {
-           var roles= await _roleManager.Roles.Where(x => !x.IsDeafult && (!x.IsDeleted||(includeDisabled==true))).ProjectToType<RolesResponse>().ToListAsync();
+           var roles= await _roleManager.Roles.Where(x=> x.Name!="SuperAdmin" && (!x.IsDeleted||(includeDisabled==true))).ProjectToType<RolesResponse>().ToListAsync();
 
             return roles;
         }

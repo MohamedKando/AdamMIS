@@ -9,8 +9,7 @@ namespace AdamMIS.Data.EntitiesConfigurations.UserEntitesConfigurations
         {
           
 
-            builder.Property(x => x.FirstName).HasMaxLength(30);
-            builder.Property(x => x.LastName).HasMaxLength(30);
+          
             var passwordHasher = new PasswordHasher<ApplicationUser>();
             builder.HasData(new ApplicationUser
             {

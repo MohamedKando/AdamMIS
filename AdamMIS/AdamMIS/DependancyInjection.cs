@@ -28,6 +28,9 @@ namespace AdamMIS
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
+
+            services.AddScoped<PermissionsSeeder>();
+
             services.AddProblemDetails();
             return services;
         }
