@@ -7,6 +7,8 @@
         public static readonly Error PermissionNotFound = new Error("Permission.NotFound", " one or more of your entired permission is not exist");
         public static readonly Error RoleNotFound = new Error("Role.NotFound", " Tone or more of your entired permission are not exist");
 
+         public static readonly Error UserRoleExist = new Error("Role.RoleExist", " The User already own this role/roles");
+
 
 
     }

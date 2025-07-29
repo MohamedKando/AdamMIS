@@ -1,9 +1,12 @@
-﻿using AdamMIS.Contract.Authentications;
+﻿using AdamMIS.Abstractions;
+using AdamMIS.Contract.Authentications;
+using AdamMIS.Contract.UserRole;
 using AdamMIS.Contract.Users;
 using AdamMIS.Services.AuthServices;
 using AdamMIS.Services.UsersServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AdamMIS.Controllers
 {
@@ -13,7 +16,7 @@ namespace AdamMIS.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IUserService _userService;
-        public UserController(AppDbContext context , IUserService userService)
+        public UserController(AppDbContext context, IUserService userService)
         {
             _context = context;
             _userService = userService;
@@ -21,7 +24,7 @@ namespace AdamMIS.Controllers
         [HttpGet("")]
         public async Task<IEnumerable<ApplicationUser>> GetAllUsers()
         {
-        
+
             var user = await _userService.GetAllUsersAsync();
             return user;
         }
@@ -46,7 +49,7 @@ namespace AdamMIS.Controllers
         public async Task<IActionResult> AddUser(CreateUserRequest request)
         {
 
-            var result  = await _userService.AddUserAsync(request);
+            var result = await _userService.AddUserAsync(request);
             if (!result.IsSuccess)
                 return Problem(statusCode: StatusCodes.Status400BadRequest, title: result.Error.Code, detail: result.Error.Description);
             return CreatedAtAction(nameof(GetAllUsers), new { result.Value!.Id }, result.Value);
@@ -54,8 +57,8 @@ namespace AdamMIS.Controllers
 
         }
 
-        [HttpPut("")]
-        public async Task<IActionResult> ToggleStatues (string id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ToggleStatues(string id)
         {
 
             var result = await _userService.ToggleStatusAsync(id);
@@ -63,6 +66,36 @@ namespace AdamMIS.Controllers
             if (!result.IsSuccess)
                 Problem(statusCode: StatusCodes.Status400BadRequest, title: result.Error.Code, detail: result.Error.Description);
             return NoContent();
+        }
+
+
+
+
+        [HttpPost("role-user/assign")]
+        public async Task<IActionResult> AssignRolesToUser([FromBody] UserRoleRequest request)
+        {
+            var assignedBy = User.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
+            var assignments = await _userService.AssignRolesToUserAsync(request, assignedBy);
+            if (assignments.IsSuccess)
+            {
+                return Ok(assignments);
+            }
+
+            return Problem(statusCode: StatusCodes.Status400BadRequest, title: assignments.Error.Code, detail: assignments.Error.Description);
+        }
+
+
+        [HttpPut("role-remove")]
+        public async Task<IActionResult> RemoveRoleFromUser([FromBody] UserRoleRequest request)
+        {
+            
+            var result = await _userService.RemoveRoleFromUserAsync(request);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+
+            return Problem(statusCode: StatusCodes.Status400BadRequest, title: result.Error.Code, detail: result.Error.Description);
         }
     }
 

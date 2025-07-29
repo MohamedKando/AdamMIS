@@ -1,18 +1,20 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AdamMIS.Data.EntitiesConfigurations.UserEntitesConfigurations
 {
-    public class UserRoleConfigurations : IEntityTypeConfiguration<IdentityUserRole<string>>
+    public class UserRoleConfigurations : IEntityTypeConfiguration<ApplicationUserRole>
     {
-        public void Configure(EntityTypeBuilder<IdentityUserRole<string>> builder)
+        public void Configure(EntityTypeBuilder<ApplicationUserRole> builder)
         {
-            builder.HasData(new IdentityUserRole<string>
-            {
-                UserId=DeafultUsers.AdminId,
-                RoleId=DeafultRole.AdminRoleId,
-            
-            });
+            builder.HasOne(ur => ur.User)
+                .WithMany()
+                .HasForeignKey(ur => ur.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(ur => ur.Role)
+                .WithMany()
+                .HasForeignKey(ur => ur.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

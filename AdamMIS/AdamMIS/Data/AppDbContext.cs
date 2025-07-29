@@ -16,6 +16,8 @@ namespace AdamMIS.Data
         public DbSet<Reports> Reports { get; set; }
         public DbSet<UserReports> UserReports { get; set; }
 
+        public DbSet<ApplicationUserRole> ApplicationUserRole { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
