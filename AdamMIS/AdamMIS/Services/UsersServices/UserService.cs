@@ -74,6 +74,16 @@ namespace AdamMIS.Services.UsersServices
             return users;
         }
 
+        public async Task<Result<IEnumerable<string>>> GetUserRolesAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return Result.Failure< IEnumerable<string>>(UserErrors.UserNotFound);
+
+            var roles = await _userManager.GetRolesAsync(user);
+            return Result.Success<IEnumerable<string>>(roles);
+        }
+
         public async Task<Result<UserResponse>> AddUserAsync(CreateUserRequest request)
         {
             var userIsExist = await _userManager.Users.AnyAsync(x => x.UserName == request.UserName);
@@ -143,113 +153,36 @@ namespace AdamMIS.Services.UsersServices
 
 
 
-        public async Task<Result<IEnumerable<UserRoleResponse>>> AssignRolesToUserAsync(UserRoleRequest request, string assignedBy)
+        public async Task<Result> UpdateUserRolesAsync(UserRoleRequest request)
         {
-            var assignments = new List<ApplicationUserRole>();
-            var identityResult = new IdentityResult { };
             var user = await _userManager.FindByIdAsync(request.UserId);
             if (user == null)
-                return Result.Failure<IEnumerable<UserRoleResponse>>(RolesErrors.RoleNotFound);
+                return Result.Failure<UserRoleResponse>(UserErrors.UserNotFound);
 
-            var assignedByUser = await _userManager.FindByNameAsync(assignedBy);
-            if (assignedByUser == null)
-                return Result.Failure<IEnumerable<UserRoleResponse>>(UserErrors.UserNotFound);
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            var allRoles = await _roleManager.Roles.ToListAsync();
 
-            var successfulAssignments = new List<string>();
+            // Convert role IDs to names
+            var requestedRoleNames = allRoles
+                .Where(r => request.RoleIds.Contains(r.Id))
+                .Select(r => r.Name)
+                .ToList();
 
-            foreach (var roleId in request.RoleIds)
-            {
-                var role = await _roleManager.FindByIdAsync(roleId);
-                if (role == null || role.IsDeleted)
-                    continue;
+            // Determine what to add and what to remove
+            var rolesToAdd = requestedRoleNames.Except(currentRoles).ToList();
+            var rolesToRemove = currentRoles.Except(requestedRoleNames).ToList();
 
-                var existingAssignment = await _context.ApplicationUserRole
-                    .FirstOrDefaultAsync(ur => ur.UserId == request.UserId &&
-                                               ur.RoleId == roleId);
+            if (rolesToRemove.Any())
+                await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
 
+            if (rolesToAdd.Any())
+                await _userManager.AddToRolesAsync(user, rolesToAdd);
 
-                if (existingAssignment == null)
-                {
-                    identityResult = await _userManager.AddToRoleAsync(user, role.Name);
-                    if (identityResult.Succeeded)
-                    {
-                        var assignment = new ApplicationUserRole
-                        {
-                            UserId = request.UserId,
-                            RoleId = roleId,
+            var updatedRoles = await _userManager.GetRolesAsync(user);
 
-                            RoleName = role.Name,
-                            AssignedBy = assignedBy,
-                            AssignedAt = DateTime.UtcNow,
-                            IsActive = true
-                        };
-
-                        assignments.Add(assignment);
-                        successfulAssignments.Add(role.Name);
-                    }
-                }
-                else if (existingAssignment != null)
-                {
-                    return Result.Failure<IEnumerable<UserRoleResponse>>(RolesErrors.UserRoleExist);
-                }
-            }
-
-            if (successfulAssignments.Any())
-            {
-                await _context.ApplicationUserRole.AddRangeAsync(assignments);
-                await _context.SaveChangesAsync();
-
-
-                var response = assignments.Adapt<List<UserRoleResponse>>();
-                return Result.Success<IEnumerable<UserRoleResponse>>(response);
-            }
-
-
-            var error = identityResult.Errors.First();
-
-            return Result.Failure<IEnumerable<UserRoleResponse>>(new Error(error.Code, error.Description));
-
-
+            return Result.Success();
         }
 
-        public async Task<Result> RemoveRoleFromUserAsync(UserRoleRequest request)
-        {
-            var identityResult = new IdentityResult { };
-            var successfulRemoves = new List<string>();
-            var user = await _userManager.FindByIdAsync(request.UserId);
-            if (user == null)
-                return Result.Failure(UserErrors.UserNotFound);
-            foreach (var roleId in request.RoleIds)
-            {
-                var role = await _roleManager.FindByIdAsync(roleId);
-                if (role == null)
-                    return Result.Failure(RolesErrors.RoleNotFound);
-
-                if (await _userManager.IsInRoleAsync(user, role.Name))
-                {
-                    // Remove from Identity system
-                    identityResult = await _userManager.RemoveFromRoleAsync(user, role.Name);
-                    if (identityResult.Succeeded)
-                    {
-
-
-                        successfulRemoves.Add(roleId);
-
-                        
-                    }
-
-                    
-
-                }
-            }
-
-            if(successfulRemoves.Any())
-            {
-                return Result.Success();
-            }
-            var error = identityResult.Errors.First();
-            return Result.Failure(new Error(error.Code, error.Description));
-        }
 
 
     }

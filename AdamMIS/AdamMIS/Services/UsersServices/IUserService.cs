@@ -7,12 +7,12 @@ namespace AdamMIS.Services.UsersServices
     {
         Task<IEnumerable<ApplicationUser>> GetAllUsersAsync();
         Task<IEnumerable<UserResponse>> GetAllAsync();
+        Task<Result<IEnumerable<string>>> GetUserRolesAsync(string userId);
         Task<Result<UserResponse>> AddUserAsync(CreateUserRequest request);
         Task<IEnumerable<UserResponse>> GetAllBannedUsersAsync();
         Task<Result> ToggleStatusAsync(string id);
 
-        Task<Result<IEnumerable<UserRoleResponse>>> AssignRolesToUserAsync(UserRoleRequest request, string assignedBy);
-        Task<Result> RemoveRoleFromUserAsync(UserRoleRequest request);
+        Task<Result> UpdateUserRolesAsync(UserRoleRequest request);
         //Task<IEnumerable<UserRoleResponse>> GetUserRoleAssignmentsAsync(string userId);
 
     }

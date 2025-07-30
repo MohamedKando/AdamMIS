@@ -45,6 +45,13 @@ namespace AdamMIS.Controllers
             return Ok(users);
         }
 
+        [HttpGet("{userId}/roles")]
+        public async Task<IActionResult> GetUserRoles(string userId)
+        {
+            var roles = await _userService.GetUserRolesAsync(userId);
+            return Ok(roles.Value);
+        }
+
         [HttpPost("")]
         public async Task<IActionResult> AddUser(CreateUserRequest request)
         {
@@ -71,32 +78,21 @@ namespace AdamMIS.Controllers
 
 
 
-        [HttpPost("role-user/assign")]
-        public async Task<IActionResult> AssignRolesToUser([FromBody] UserRoleRequest request)
-        {
-            var assignedBy = User.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
-            var assignments = await _userService.AssignRolesToUserAsync(request, assignedBy);
-            if (assignments.IsSuccess)
-            {
-                return Ok(assignments);
-            }
-
-            return Problem(statusCode: StatusCodes.Status400BadRequest, title: assignments.Error.Code, detail: assignments.Error.Description);
-        }
-
-
-        [HttpPut("role-remove")]
-        public async Task<IActionResult> RemoveRoleFromUser([FromBody] UserRoleRequest request)
+        [HttpPut("role-update")]
+        public async Task<IActionResult> UpdateUserRoles([FromBody] UserRoleRequest request)
         {
             
-            var result = await _userService.RemoveRoleFromUserAsync(request);
+            var result = await _userService.UpdateUserRolesAsync(request);
             if (result.IsSuccess)
             {
-                return Ok(result);
+                return NoContent();
             }
 
             return Problem(statusCode: StatusCodes.Status400BadRequest, title: result.Error.Code, detail: result.Error.Description);
         }
+
+
+       
     }
 
 
