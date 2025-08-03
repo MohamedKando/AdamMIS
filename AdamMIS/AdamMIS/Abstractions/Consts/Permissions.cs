@@ -39,6 +39,8 @@
         //View Permisstions
         public const string ViewReportManager = "View Report Manager";
 
+        public const string ViewAdminManager = "View Admin Manager";
+
         public static IList<string?> GetAllPermissions()
         {
 

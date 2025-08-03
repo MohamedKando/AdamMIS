@@ -30,10 +30,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddDependency(builder.Configuration);
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        builder => builder.AllowAnyOrigin()
-                          .AllowAnyHeader()
-                          .AllowAnyMethod());
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
 });
 // This builder use for generate logging file
 builder.Host.UseSerilog((context, configuration) =>

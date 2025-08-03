@@ -7,9 +7,12 @@ namespace AdamMIS.Data.EntitiesConfigurations.UserEntitesConfigurations
     {
         public void Configure(EntityTypeBuilder<ApplicationUser> builder)
         {
-          
 
-          
+            builder.HasOne(u => u.Department)
+            .WithMany(d => d.Users)
+            .HasForeignKey(u => u.DepartmentId)
+            .OnDelete(DeleteBehavior.SetNull);
+
             var passwordHasher = new PasswordHasher<ApplicationUser>();
             builder.HasData(new ApplicationUser
             {

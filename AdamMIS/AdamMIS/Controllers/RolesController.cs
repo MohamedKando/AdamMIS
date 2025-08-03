@@ -17,6 +17,7 @@ namespace AdamMIS.Controllers
         }
 
         [HttpGet("")]
+        [HasPermission(Permissions.ReadRoles)]
         public async Task<IActionResult> GetAll([FromQuery]bool? includeDisabled )
         {
             var response = await _roleService.GetAllAsync(includeDisabled);
@@ -25,7 +26,7 @@ namespace AdamMIS.Controllers
         }
 
         [HttpGet("role-details/{id}")]
-         
+        [HasPermission(Permissions.ReadRoles)]
         public async Task<IActionResult> GetRoleDetails([FromRoute] string id)
         {
             var roleDetail = await _roleService.GetRolesDetailsAsync(id);
@@ -35,6 +36,7 @@ namespace AdamMIS.Controllers
         }
 
         [HttpPost("")]
+        [HasPermission(Permissions.AddRoles)]
         public async Task<IActionResult> AddRole([FromBody] RoleRequest request)
         {
             var result = await _roleService.AddRoleAsync(request);
@@ -46,6 +48,7 @@ namespace AdamMIS.Controllers
         }
 
         [HttpPut("{id}")]
+        [HasPermission(Permissions.UpdateRoles)]
         public async Task<IActionResult> UpdateRole([FromRoute] string id,[FromBody] RoleRequest request)
         {
             var result = await _roleService.UpdateRoleAsync(id,request);
@@ -53,6 +56,7 @@ namespace AdamMIS.Controllers
         }
 
         [HttpGet("permissions")]
+        [HasPermission(Permissions.ReadRoles)]
         public ActionResult<IList<string>> GetAvailablePermissions()
         {
             try

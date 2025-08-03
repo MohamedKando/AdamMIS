@@ -31,6 +31,7 @@ namespace AdamMIS.Controllers
         //#region Category Management
 
         [HttpGet("categories")]
+        [HasPermission(Permissions.ReadCategories)]
         public async Task<ActionResult<IEnumerable<RCategoryResponse>>> GetAllCategories()
         {
             try
@@ -46,6 +47,7 @@ namespace AdamMIS.Controllers
         }
 
         [HttpGet("categories/{id}")]
+        [HasPermission(Permissions.ReadCategories)]
         public async Task<ActionResult<RCategoryResponse>> GetCategoryById(int id)
         {
             try
@@ -64,6 +66,7 @@ namespace AdamMIS.Controllers
         }
 
         [HttpPost("categories")]
+        [HasPermission(Permissions.AddCategories)]
         public async Task<ActionResult<RCategoryResponse>> CreateCategory([FromBody] RCategoryRequest request)
         {
             try
@@ -81,6 +84,7 @@ namespace AdamMIS.Controllers
             }
         }
         [HttpDelete("categories/{id}")]
+        [HasPermission(Permissions.DeleteCategories)]
         public async Task<ActionResult> DeleteCategory(int id)
         {
             try
@@ -124,7 +128,7 @@ namespace AdamMIS.Controllers
         //#region Report Management
 
         [HttpGet("reports")]
-        
+        [HasPermission(Permissions.ReadReports)]
         public async Task<ActionResult<IEnumerable<ReportResponse>>> GetAllReports()
         {
             try
@@ -142,6 +146,7 @@ namespace AdamMIS.Controllers
 
 
         [HttpGet("reports/{id}")]
+        [HasPermission(Permissions.ReadReports)]
         public async Task<ActionResult<ReportResponse>> GetReportById(int id)
         {
             try
@@ -162,6 +167,7 @@ namespace AdamMIS.Controllers
 
 
         [HttpGet("reports/category/{categoryId}")]
+        [HasPermission(Permissions.ReadReports)]
         public async Task<ActionResult<IEnumerable<ReportResponse>>> GetReportsByCategory(int categoryId)
         {
             try
@@ -229,6 +235,7 @@ namespace AdamMIS.Controllers
         //#region User Report Assignment
 
         [HttpPost("user-reports/assign")]
+        [HasPermission(Permissions.AddReports)]
         public async Task<ActionResult<IEnumerable<UserReportResponse>>> AssignReportsToUsers([FromBody] UserReportRequest request)
         {
             try

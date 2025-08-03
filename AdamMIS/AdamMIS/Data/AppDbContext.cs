@@ -15,7 +15,7 @@ namespace AdamMIS.Data
         public DbSet<RCategories> RCategories { get; set; }
         public DbSet<Reports> Reports { get; set; }
         public DbSet<UserReports> UserReports { get; set; }
-
+        public DbSet<Department> Departments { get; set; }
         public DbSet<ApplicationUserRole> ApplicationUserRole { get; set; }
 
 

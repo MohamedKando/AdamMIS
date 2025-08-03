@@ -11,9 +11,18 @@ namespace AdamMIS.Services.UsersServices
         Task<Result<UserResponse>> AddUserAsync(CreateUserRequest request);
         Task<IEnumerable<UserResponse>> GetAllBannedUsersAsync();
         Task<Result> ToggleStatusAsync(string id);
-
         Task<Result> UpdateUserRolesAsync(UserRoleRequest request);
-        //Task<IEnumerable<UserRoleResponse>> GetUserRoleAssignmentsAsync(string userId);
+
+        Task<IEnumerable<string>> GetAllDepartmentsAsync();
+
+        //User Profile
+        Task<Result<UserResponse>> GetUserProfileByIdAsync(string userId);
+        Task<Result> AdminResetPasswordAsync(AdminResetPasswordRequest request);
+        Task<Result> ChangePasswordAsync(string userId ,UserChangePasswordRequest request);
+
+        Task<Result<UserResponse>> UpdateProfileAsync(string id, UpdateUserProfileRequest request);
+
+
 
     }
 }

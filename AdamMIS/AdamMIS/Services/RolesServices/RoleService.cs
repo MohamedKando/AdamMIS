@@ -9,10 +9,12 @@ namespace AdamMIS.Services.RolesServices
     {
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly AppDbContext _context;
-        public RoleService(RoleManager<ApplicationRole> roleManager , AppDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public RoleService(RoleManager<ApplicationRole> roleManager , AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _roleManager = roleManager;
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<IEnumerable<RolesResponse>> GetAllAsync(bool? includeDisabled = false)
@@ -145,20 +147,30 @@ namespace AdamMIS.Services.RolesServices
 
 
 
-        public async Task <bool> ToggleStatusAsync (string id)
+        public async Task<bool> ToggleStatusAsync(string id)
         {
-            var role = await _roleManager.FindByIdAsync (id);
+            var role = await _roleManager.FindByIdAsync(id);
             if (role == null)
-            {
                 return false;
+
+            role.IsDeleted = !role.IsDeleted;
+
+            var updateResult = await _roleManager.UpdateAsync(role);
+            if (!updateResult.Succeeded)
+                return false;
+
+            // If disabling the role, remove it from all users
+            if (role.IsDeleted)
+            {
+                var usersWithRole = await _userManager.GetUsersInRoleAsync(role.Name);
+                foreach (var user in usersWithRole)
+                {
+                    await _userManager.RemoveFromRoleAsync(user, role.Name);
+                }
             }
 
-            role.IsDeleted =  !role.IsDeleted;
-
-
-            await _roleManager.UpdateAsync(role);
             return true;
-
         }
+
     }
 }

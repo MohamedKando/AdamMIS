@@ -15,6 +15,8 @@ namespace AdamMIS.Data.EntitiesConfigurations.UserEntitesConfigurations
                 .WithMany()
                 .HasForeignKey(ur => ur.RoleId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+
         }
     }
 }

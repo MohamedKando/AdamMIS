@@ -53,26 +53,34 @@ namespace AdamMIS.Services.UsersServices
 
         public async Task<IEnumerable<UserResponse>> GetAllAsync()
         {
-            var users = await (from u in _context.Users
-                               join ur in _context.UserRoles on u.Id equals ur.UserId into userRoles
-                               from ur in userRoles.DefaultIfEmpty()
-                               join r in _context.Roles on ur.RoleId equals r.Id into roles
-                               from r in roles.DefaultIfEmpty()
+            var users = await (
+                from u in _context.Users
+                join d in _context.Departments on u.DepartmentId equals d.Id into departments
+                from d in departments.DefaultIfEmpty()
 
-                               where r == null || r.Name != DeafultRole.SuperAdmin
+                join ur in _context.UserRoles on u.Id equals ur.UserId into userRoles
+                from ur in userRoles.DefaultIfEmpty()
+                join r in _context.Roles on ur.RoleId equals r.Id into roles
+                from r in roles.DefaultIfEmpty()
 
-                               group new { u, r } by new { u.Id, u.UserName, u.IsDisabled } into g
-                               select new UserResponse
-                               {
-                                   Id = g.Key.Id,
-                                   UserName = g.Key.UserName!,
-                                   IsDisabled = g.Key.IsDisabled,
-                                   Roles = g.Where(x => x.r != null).Select(x => x.r!.Name!)
-                               }).ToListAsync();
+                where r == null || r.Name != DeafultRole.SuperAdmin
 
+                group new { u, r, d } by new { u.Id, u.UserName, u.IsDisabled, u.Title, DepartmentName = d.Name } into g
+
+                select new UserResponse
+                {
+                    Id = g.Key.Id,
+                    UserName = g.Key.UserName!,
+                    IsDisabled = g.Key.IsDisabled,
+                    Title = g.Key.Title,
+                    DepartmentName = g.Key.DepartmentName,
+                    Roles = g.Where(x => x.r != null).Select(x => x.r!.Name!)
+                }
+            ).ToListAsync();
 
             return users;
         }
+
 
         public async Task<Result<IEnumerable<string>>> GetUserRolesAsync(string userId)
         {
@@ -88,33 +96,41 @@ namespace AdamMIS.Services.UsersServices
         {
             var userIsExist = await _userManager.Users.AnyAsync(x => x.UserName == request.UserName);
             if (userIsExist)
-            {
                 return Result.Failure<UserResponse>(UserErrors.DublicatedUser);
 
-            }
+            var allowedDepartments = await _context.Departments.ToListAsync();
+            var department = allowedDepartments.FirstOrDefault(x => x.Name == request.DepartmentName);
+            if (department == null)
+                return Result.Failure<UserResponse>(DepartmentErrors.DepartmentNotFound);
 
             var allowedRoles = await _roleService.GetAllAsync();
-
             if (request.Roles.Except(allowedRoles.Select(x => x.Name)).Any())
                 return Result.Failure<UserResponse>(RolesErrors.RoleNotFound);
 
             var user = request.Adapt<ApplicationUser>();
-            var result = await _userManager.CreateAsync(user, request.Password);
+            user.DepartmentId = department.Id;
+            user.Title = request.Title;
 
-            if (result.Succeeded)
+            var result = await _userManager.CreateAsync(user, request.Password);
+            if (!result.Succeeded)
             {
-                await _userManager.AddToRolesAsync(user, request.Roles);
-                var response = new UserResponse
-                {
-                    Id = user.Id,
-                    UserName = user.UserName!,
-                    IsDisabled = user.IsDisabled,
-                    Roles = request.Roles
-                };
-                return Result.Success(response);
+                var error = result.Errors.First();
+                return Result.Failure<UserResponse>(new Error(error.Code, error.Description));
             }
-            var error = result.Errors.First();
-            return Result.Failure<UserResponse>(new Error(error.Code, error.Description));
+
+            await _userManager.AddToRolesAsync(user, request.Roles);
+
+            var response = new UserResponse
+            {
+                Id = user.Id,
+                UserName = user.UserName!,
+                IsDisabled = user.IsDisabled,
+                Roles = request.Roles,
+                DepartmentName = department.Name,
+                Title = request.Title,
+            };
+
+            return Result.Success(response);
         }
 
 
@@ -182,6 +198,124 @@ namespace AdamMIS.Services.UsersServices
 
             return Result.Success();
         }
+
+        public async Task<IEnumerable<string>> GetAllDepartmentsAsync()
+        {
+            var departments = await _context.Departments
+                .Select(r => r.Name)
+                .ToListAsync();
+
+            return departments;
+        }
+
+
+
+
+
+
+
+        //User Profile
+
+        public async Task<Result<UserResponse>> GetUserProfileByIdAsync(string userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.Department)
+                .FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (user == null)
+                return Result.Failure<UserResponse>(UserErrors.UserNotFound);
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var response = new UserResponse
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                IsDisabled = user.IsDisabled,
+                Email = user.Email, // ✅ Add this line
+                Title = user.Title,
+                DepartmentName = user.Department?.Name,
+                Roles = roles
+            };
+
+            return Result.Success(response);
+        }
+
+
+
+        public async Task<Result> ChangePasswordAsync(string userId ,UserChangePasswordRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            var result = await _userManager.ChangePasswordAsync(user!, request.OldPassword, request.NewPassword);
+            if (!result.Succeeded)
+            {
+                var error = result.Errors.First();
+                return Result.Failure(new Error(error.Code, error.Description));
+            }
+
+            return Result.Success();
+        }
+
+
+        public async Task<Result> AdminResetPasswordAsync(AdminResetPasswordRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(request.UserId);
+            if (user == null)
+                return Result.Failure(UserErrors.UserNotFound);
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, request.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                var error = result.Errors.First();
+                return Result.Failure(new Error(error.Code, error.Description));
+            }
+
+            return Result.Success();
+        }
+
+
+
+        public async Task<Result<UserResponse>> UpdateProfileAsync(string id, UpdateUserProfileRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return Result.Failure<UserResponse>(UserErrors.UserNotFound);
+
+            if (!string.IsNullOrEmpty(request.UserName))
+                user.UserName = request.UserName;
+            if (!string.IsNullOrEmpty(request.Email))
+                user.Email = request.Email;
+
+            if (!string.IsNullOrEmpty(request.Title))
+                user.Title = request.Title;
+
+            if (!string.IsNullOrEmpty(request.Department))
+            {
+                var department = await _context.Departments.FirstOrDefaultAsync(x => x.Name == request.Department);
+                if (department == null)
+                    return Result.Failure<UserResponse>(DepartmentErrors.DepartmentNotFound);
+
+                user.DepartmentId = department.Id;
+            }
+
+            await _userManager.UpdateAsync(user);
+
+            var roles = await _userManager.GetRolesAsync(user);
+            return Result.Success(new UserResponse
+            {
+                Id = user.Id,
+                UserName = user.UserName!,
+                IsDisabled = user.IsDisabled,
+                Title = user.Title,
+                DepartmentName = request.Department,
+                Email = request.Email,
+                Roles = roles
+            });
+        }
+
 
 
 
