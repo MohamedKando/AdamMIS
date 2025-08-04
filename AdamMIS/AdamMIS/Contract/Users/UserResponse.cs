@@ -8,6 +8,8 @@
         public string? Email { get; set; } = string.Empty;
         public string? Title { get; set; }
         public string? DepartmentName { get; set; }
+
+        public string? PhotoPath { get; set; }
         public IEnumerable<string> Roles { get; set; } = Enumerable.Empty<string>();
     }
 }

@@ -2,6 +2,7 @@
 
 using AdamMIS.Authentications.Filters;
 using AdamMIS.Contract.Reports;
+using AdamMIS.Entities.ReportsEnitites;
 using AdamMIS.Services.ReportsServices;
 using FastReport;
 using FastReport.Export.PdfSimple;
@@ -128,7 +129,7 @@ namespace AdamMIS.Controllers
         //#region Report Management
 
         [HttpGet("reports")]
-        [HasPermission(Permissions.ReadReports)]
+      //  [HasPermission(Permissions.ReadReports)]
         public async Task<ActionResult<IEnumerable<ReportResponse>>> GetAllReports()
         {
             try
@@ -146,7 +147,7 @@ namespace AdamMIS.Controllers
 
 
         [HttpGet("reports/{id}")]
-        [HasPermission(Permissions.ReadReports)]
+       // [HasPermission(Permissions.ReadReports)]
         public async Task<ActionResult<ReportResponse>> GetReportById(int id)
         {
             try
@@ -167,7 +168,7 @@ namespace AdamMIS.Controllers
 
 
         [HttpGet("reports/category/{categoryId}")]
-        [HasPermission(Permissions.ReadReports)]
+       // [HasPermission(Permissions.ReadReports)]
         public async Task<ActionResult<IEnumerable<ReportResponse>>> GetReportsByCategory(int categoryId)
         {
             try
@@ -466,7 +467,59 @@ namespace AdamMIS.Controllers
 
 
 
+        [HttpPost("reports/{reportId}/edit")]
+        public async Task<IActionResult> OpenReportFile(int reportId)
+        {
+            try
+            {
+                // Step 1: Get the report details from database
+                var report = await _reportService.GetReportByIdAsync(reportId);
+                if (report == null)
+                    return NotFound(new { message = "Report not found." });
 
+                // Step 2: Use the FilePath stored in the database
+                var originalFilePath = report.FilePath;
+
+                // Step 3: Validate the original file exists
+                if (string.IsNullOrEmpty(originalFilePath) || !System.IO.File.Exists(originalFilePath))
+                {
+                    _logger.LogError($"Report file not found at path: {originalFilePath}");
+                    return NotFound(new { message = "Report file not found on server." });
+                }
+
+                // Step 4: Validate file extension
+                var fileExtension = Path.GetExtension(originalFilePath)?.ToLowerInvariant();
+                if (fileExtension != ".rpt")
+                {
+                    _logger.LogError($"Invalid file type: {fileExtension}");
+                    return BadRequest(new { message = "Invalid report file type." });
+                }
+
+                // Step 5: Open the file
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "devenv.exe",
+                    Arguments = $"\"{originalFilePath}\"",
+                    UseShellExecute = true
+                });
+
+                _logger.LogInformation($"Opened report file: {originalFilePath}");
+
+                return Ok(new
+                {
+                    message = "Report opened successfully.",
+                    reportId = reportId,
+                    fileName = report.FileName,
+                    filePath = originalFilePath,
+                    openedAt = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error opening report for ID {ReportId}", reportId);
+                return StatusCode(500, new { message = "An error occurred while opening the report." });
+            }
+        }
 
 
 

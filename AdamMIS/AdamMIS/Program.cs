@@ -5,6 +5,7 @@
 
 using AdamMIS.Authentications.Filters;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.FileProviders;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -51,7 +52,12 @@ using (var scope = app.Services.CreateScope())
     var permissionSeeder = scope.ServiceProvider.GetRequiredService<PermissionsSeeder>();
     await permissionSeeder.SeedPermissionsAsync();
 }
-
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.WebRootPath, "Uploads")),
+    RequestPath = "/Uploads"
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

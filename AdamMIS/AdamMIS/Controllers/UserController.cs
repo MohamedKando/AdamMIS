@@ -25,7 +25,7 @@ namespace AdamMIS.Controllers
             _userService = userService;
         }
         [HttpGet("")]
-        [HasPermission(Permissions.ReadUsers)]
+      //  [HasPermission(Permissions.ReadUsers)]
         public async Task<IEnumerable<ApplicationUser>> GetAllUsers()
         {
 
@@ -34,7 +34,7 @@ namespace AdamMIS.Controllers
         }
 
         [HttpGet("users-with-roles")]
-        [HasPermission(Permissions.ReadUsers)]
+      //  [HasPermission(Permissions.ReadUsers)]
         public async Task<IActionResult> GetAll()
         {
 
@@ -43,7 +43,7 @@ namespace AdamMIS.Controllers
         }
 
         [HttpGet("banned-users")]
-        [HasPermission(Permissions.ReadUsers)]
+       // [HasPermission(Permissions.ReadUsers)]
         public async Task<IActionResult> GetAllBannedUsers()
         {
 
@@ -52,7 +52,7 @@ namespace AdamMIS.Controllers
         }
 
         [HttpGet("{userId}/roles")]
-        [HasPermission(Permissions.ReadRoles)]
+       // [HasPermission(Permissions.ReadRoles)]
         public async Task<IActionResult> GetUserRoles(string userId)
         {
             var roles = await _userService.GetUserRolesAsync(userId);
@@ -60,7 +60,7 @@ namespace AdamMIS.Controllers
         }
 
         [HttpPost("")]
-        [HasPermission(Permissions.RegisterUsers)]
+       // [HasPermission(Permissions.RegisterUsers)]
         public async Task<IActionResult> AddUser(CreateUserRequest request)
         {
 
@@ -73,7 +73,7 @@ namespace AdamMIS.Controllers
         }
 
         [HttpPut("{id}")]
-        [HasPermission(Permissions.DeleteUsers)]
+      //  [HasPermission(Permissions.DeleteUsers)]
         public async Task<IActionResult> ToggleStatues(string id)
         {
 
@@ -88,7 +88,7 @@ namespace AdamMIS.Controllers
 
 
         [HttpPut("role-update")]
-        [HasPermission(Permissions.UpdateRoles)]
+       // [HasPermission(Permissions.UpdateRoles)]
         public async Task<IActionResult> UpdateUserRoles([FromBody] UserRoleRequest request)
         {
             
@@ -126,7 +126,7 @@ namespace AdamMIS.Controllers
 
 
         [HttpGet("{id}")]
-        [Authorize]
+       [Authorize]
         public async Task<IActionResult> GetById(string id)
         {
             var result = await _userService.GetUserProfileByIdAsync(id);
@@ -136,12 +136,12 @@ namespace AdamMIS.Controllers
         }
 
         [HttpPost("reset-password")]
-        [HasPermission(Permissions.UpdateUsers)]
+       // [HasPermission(Permissions.UpdateUsers)]
         public async Task<IActionResult> ResetPassword([FromBody] AdminResetPasswordRequest request)
         {
             var result = await _userService.AdminResetPasswordAsync(request);
             if (!result.IsSuccess)
-                return Problem(result.Error.Description);
+                return Problem(statusCode: StatusCodes.Status400BadRequest, title: result.Error.Code, detail: result.Error.Description);
             return NoContent();
         }
 
@@ -154,21 +154,28 @@ namespace AdamMIS.Controllers
         {
             var result = await _userService.ChangePasswordAsync(User.GetUserId(), request);
             if (!result.IsSuccess)
-                return Problem(result.Error.Description);
+                return Problem(statusCode: StatusCodes.Status400BadRequest, title: result.Error.Code, detail: result.Error.Description);
             return NoContent();
         }
 
         [HttpPut("update-profile/{id}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> UpdateProfile(string id, UpdateUserProfileRequest request)
         {
             var result = await _userService.UpdateProfileAsync(id, request);
             if (!result.IsSuccess)
-                return Problem(result.Error.Description);
+                return Problem(statusCode: StatusCodes.Status400BadRequest, title: result.Error.Code, detail: result.Error.Description);
             return Ok(result.Value);
         }
 
-
+        [HttpPost("UploadPhoto")]
+        public async Task<ActionResult> UploadPhoto([FromForm] UploadUserPhotoRequest model)
+        {
+            var result = await _userService.UploadUserPhotoAsync(model);
+            if (result.IsSuccess)
+                return Ok(new { photoPath = result.Value });
+            return  NoContent();
+        }
 
     }
 

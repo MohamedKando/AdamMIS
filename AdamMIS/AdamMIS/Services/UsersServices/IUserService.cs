@@ -21,6 +21,7 @@ namespace AdamMIS.Services.UsersServices
         Task<Result> ChangePasswordAsync(string userId ,UserChangePasswordRequest request);
 
         Task<Result<UserResponse>> UpdateProfileAsync(string id, UpdateUserProfileRequest request);
+        Task<Result<string>> UploadUserPhotoAsync(UploadUserPhotoRequest request);
 
 
 

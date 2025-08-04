@@ -14,13 +14,15 @@ namespace AdamMIS.Services.UsersServices
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IRoleService _roleService;
         private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly IWebHostEnvironment _env;
 
-        public UserService(AppDbContext context, UserManager<ApplicationUser> userManager, IRoleService roleService, RoleManager<ApplicationRole> roleManager)
+        public UserService(AppDbContext context, UserManager<ApplicationUser> userManager, IRoleService roleService, RoleManager<ApplicationRole> roleManager, IWebHostEnvironment env)
         {
             _context = context;
             _userManager = userManager;
             _roleService = roleService;
             _roleManager = roleManager;
+            _env = env;
         }
 
         public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
@@ -230,12 +232,14 @@ namespace AdamMIS.Services.UsersServices
             var response = new UserResponse
             {
                 Id = user.Id,
-                UserName = user.UserName,
+                UserName = user.UserName!,
                 IsDisabled = user.IsDisabled,
                 Email = user.Email, // ✅ Add this line
                 Title = user.Title,
                 DepartmentName = user.Department?.Name,
-                Roles = roles
+                Roles = roles,
+                PhotoPath = user.PhotoPath,
+                
             };
 
             return Result.Success(response);
@@ -280,6 +284,10 @@ namespace AdamMIS.Services.UsersServices
 
         public async Task<Result<UserResponse>> UpdateProfileAsync(string id, UpdateUserProfileRequest request)
         {
+          
+            var isExist = await _userManager.Users.AnyAsync(x => x.UserName == request.UserName&& x.Id != id);
+            if (isExist)
+                return Result.Failure<UserResponse>(UserErrors.DublicatedUser);
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
                 return Result.Failure<UserResponse>(UserErrors.UserNotFound);
@@ -317,7 +325,48 @@ namespace AdamMIS.Services.UsersServices
         }
 
 
+        public async Task<Result<string>> UploadUserPhotoAsync(UploadUserPhotoRequest request)
+        {
+            var user = await _context.Users.FindAsync(request.UserId);
+            if (user == null)
+                return Result.Failure<string>(UserErrors.UserNotFound);
 
+            var wwwRootPath = _env.WebRootPath;
+            var uploadsFolder = Path.Combine(wwwRootPath, "Uploads", "Users", "Images");
+
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var fileExtension = Path.GetExtension(request.Photo!.FileName);
+            var fileName = $"{request.UserId}{fileExtension}";
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            // Delete old photo if it exists
+            if (!string.IsNullOrEmpty(user.PhotoPath))
+            {
+                var oldFilePath = Path.Combine(wwwRootPath, user.PhotoPath.TrimStart('/').Replace("/", Path.DirectorySeparatorChar.ToString()));
+                if (System.IO.File.Exists(oldFilePath))
+                {
+                    System.IO.File.Delete(oldFilePath);
+                }
+            }
+
+            // Save the new photo
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await request.Photo.CopyToAsync(stream);
+            }
+
+            // Update user's photo path in DB
+            var relativePath = $"/Uploads/Users/Images/{fileName}";
+            user.PhotoPath = relativePath;
+
+            await _context.SaveChangesAsync();
+
+            return Result.Success(relativePath);
+        }
 
     }
+
 }
+

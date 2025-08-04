@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36221.1 d17.14
+VisualStudioVersion = 17.14.36221.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{E4935339-5444-4FD2-A9BE-043C9D7493FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReportEditor", "ReportEditor\ReportEditor.csproj", "{105F9C54-9AB3-4515-86BE-57CA21B98795}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{E4935339-5444-4FD2-A9BE-043C9D7493FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4935339-5444-4FD2-A9BE-043C9D7493FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4935339-5444-4FD2-A9BE-043C9D7493FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{105F9C54-9AB3-4515-86BE-57CA21B98795}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{105F9C54-9AB3-4515-86BE-57CA21B98795}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{105F9C54-9AB3-4515-86BE-57CA21B98795}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{105F9C54-9AB3-4515-86BE-57CA21B98795}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
