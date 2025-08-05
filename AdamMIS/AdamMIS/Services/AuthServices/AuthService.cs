@@ -25,17 +25,20 @@ namespace AdamMIS.Services.AuthServices
             {
                 return Result.Failure<AuthResponse>(UserErrors.UserInvalidCredentials);
             }
+
+            // check password and activity
+            var isValidPassword = await _userManager.CheckPasswordAsync(user, password);
+            if (isValidPassword == false)
+            {
+                return Result.Failure<AuthResponse>(UserErrors.UserInvalidCredentials);
+            }
+
             if (user.IsDisabled)
             {
                 return Result.Failure<AuthResponse>(UserErrors.UserDisabled);
             }
-            // check password 
+            
 
-            var isValidPassword =await _userManager.CheckPasswordAsync(user, password);
-            if (isValidPassword == false)
-            {
-             return Result.Failure<AuthResponse>(UserErrors.UserInvalidCredentials);
-            }
 
             //generate jwt 
             var (userRoles, userPermissions) = await GetUserRolesAndPermissions(user);
@@ -76,7 +79,7 @@ namespace AdamMIS.Services.AuthServices
                 return  Result.Success(response);
             }
             var error = result.Errors.First();
-            return Result.Failure<AuthResponse>(new Error (error.Code,error.Description));
+            return Result.Failure<AuthResponse>(new Error (error.Code,error.Description,0));
         }
         public async Task<Result> ClearAllUsersAsync(CancellationToken cancellationToken)
         {

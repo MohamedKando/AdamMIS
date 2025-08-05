@@ -24,7 +24,7 @@ namespace AdamMIS.Data.EntitiesConfigurations.ReportEntitiesConfugrations
             builder.HasMany(x => x.Reports)
                 .WithOne(x => x.Category)
                 .HasForeignKey(x => x.CategoryId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

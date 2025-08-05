@@ -1,4 +1,5 @@
-﻿using AdamMIS.Contract.Authentications;
+﻿using AdamMIS.Abstractions;
+using AdamMIS.Contract.Authentications;
 using AdamMIS.Services.AuthServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +24,7 @@ namespace AdamMIS.Controllers
 
             if (authResult.IsFailure)
             {
-                return Problem(statusCode: StatusCodes.Status400BadRequest,title:authResult.Error.Code,detail:authResult.Error.Description);
+                return Problem(statusCode: authResult.Error.StatusCode, title:authResult.Error.Code,detail:authResult.Error.Description);
             }
 
 
@@ -36,7 +37,7 @@ namespace AdamMIS.Controllers
             var authResult = await _authService.RigesterAsync(request, cancellationToken);
             if (authResult.IsFailure)
             {
-                return Problem(statusCode: StatusCodes.Status400BadRequest, title: authResult.Error.Code, detail: authResult.Error.Description);
+                return Problem(statusCode: authResult.Error.StatusCode, title: authResult.Error.Code, detail: authResult.Error.Description);
             }
             else
                 return Ok(authResult.Value);
@@ -50,7 +51,7 @@ namespace AdamMIS.Controllers
 
             if (result.IsFailure)
             {
-                return Problem(statusCode: StatusCodes.Status404NotFound, title: result.Error.Code, detail: result.Error.Description);
+                return Problem(statusCode: result.Error.StatusCode, title: result.Error.Code, detail: result.Error.Description);
 
             }
             else

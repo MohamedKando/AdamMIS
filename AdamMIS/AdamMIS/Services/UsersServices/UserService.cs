@@ -3,6 +3,7 @@ using AdamMIS.Contract.UserRole;
 using AdamMIS.Contract.Users;
 using AdamMIS.Errors;
 using AdamMIS.Services.RolesServices;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Query;
 
@@ -117,7 +118,7 @@ namespace AdamMIS.Services.UsersServices
             if (!result.Succeeded)
             {
                 var error = result.Errors.First();
-                return Result.Failure<UserResponse>(new Error(error.Code, error.Description));
+                return Result.Failure<UserResponse>(new Error(error.Code, error.Description,0));
             }
 
             await _userManager.AddToRolesAsync(user, request.Roles);
@@ -155,7 +156,7 @@ namespace AdamMIS.Services.UsersServices
                 return Result.Success();
             }
             var error = result.Errors.First();
-            return Result.Failure(new Error(error.Code, error.Description));
+            return Result.Failure(new Error(error.Code, error.Description, 0));
 
         }
 
@@ -255,7 +256,8 @@ namespace AdamMIS.Services.UsersServices
             if (!result.Succeeded)
             {
                 var error = result.Errors.First();
-                return Result.Failure(new Error(error.Code, error.Description));
+                int statusCode =  StatusCodes.Status400BadRequest;
+                return Result.Failure(new Error(error.Code, error.Description, statusCode));
             }
 
             return Result.Success();
@@ -273,8 +275,9 @@ namespace AdamMIS.Services.UsersServices
 
             if (!result.Succeeded)
             {
+                int statusCode = StatusCodes.Status400BadRequest;
                 var error = result.Errors.First();
-                return Result.Failure(new Error(error.Code, error.Description));
+                return Result.Failure(new Error(error.Code, error.Description, statusCode));
             }
 
             return Result.Success();

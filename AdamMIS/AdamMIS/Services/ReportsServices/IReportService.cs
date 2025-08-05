@@ -9,7 +9,7 @@ namespace AdamMIS.Services.ReportsServices
             Task<RCategoryResponse> CreateCategoryAsync(RCategoryRequest request);
             Task<RCategoryResponse?> GetCategoryByIdAsync(int id);
             Task<RCategoryResponse> UpdateCategoryAsync(int id, RCategoryRequest request);
-            Task<bool> DeleteCategoryAsync(int id);
+            Task<Result> DeleteCategoryAsync(int id);
             Task<IEnumerable<RCategoryResponse>> GetAllCategoriesAsync();
 
 

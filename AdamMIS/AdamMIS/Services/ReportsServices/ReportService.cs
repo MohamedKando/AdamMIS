@@ -1,6 +1,7 @@
 ﻿using AdamMIS.Authentications.Filters;
 using AdamMIS.Contract.Reports;
 using AdamMIS.Entities.ReportsEnitites;
+using AdamMIS.Errors;
 using FastReport.Barcode;
 
 namespace AdamMIS.Services.ReportsServices
@@ -60,21 +61,48 @@ namespace AdamMIS.Services.ReportsServices
             return response;
         }
 
-        public Task<RCategoryResponse> UpdateCategoryAsync(int id, RCategoryRequest request)
+        public async Task<RCategoryResponse> UpdateCategoryAsync(int id, RCategoryRequest request)
         {
-            throw new NotImplementedException();
+            var category = await _context.RCategories.FindAsync(id);
+            if (category == null)
+            {
+                return null;
+            }
+
+            // Update the category properties
+            category.Name = request.Name;
+            category.Description = request.Description!;
+            category.Color = request.Color!;
+
+            _context.RCategories.Update(category);
+            await _context.SaveChangesAsync();
+
+            var response = category.Adapt<RCategoryResponse>();
+            return response;
         }
-        public async Task<bool> DeleteCategoryAsync(int id)
+        public async Task<Result> DeleteCategoryAsync(int id)
         {
+            var reports = await _context.Reports
+            .Where(r => r.CategoryId == id)
+            .ToListAsync();
+
+            // ✅ Delete report files from server
+            foreach (var report in reports)
+            {
+                if (File.Exists(report.FilePath))
+                {
+                    File.Delete(report.FilePath);
+                }
+            }
             var entity = await _context.RCategories.FindAsync(id);
             if (entity == null)
             {
-                return false;
+                return Result.Failure(CategoryErrors.CategoryNotFound);
             }
 
             _context.RCategories.Remove(entity);
             await _context.SaveChangesAsync();
-            return true;
+            return Result.Success();
         }
         public async Task<IEnumerable<RCategoryResponse>> GetAllCategoriesAsync()
         {
@@ -185,9 +213,13 @@ namespace AdamMIS.Services.ReportsServices
             var report = await _context.Reports.FindAsync(id);
             if (report == null)
                 return false;
-
+            if (File.Exists(report.FilePath))
+            {
+                File.Delete(report.FilePath);
+            }
+            _context.Reports.Remove(report);
             // Soft delete - set IsActive to false
-            report.IsActive = false;
+            //report.IsActive = false;
             await _context.SaveChangesAsync();
 
             return true;

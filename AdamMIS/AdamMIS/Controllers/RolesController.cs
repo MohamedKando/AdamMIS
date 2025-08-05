@@ -44,7 +44,7 @@ namespace AdamMIS.Controllers
             {
                 return CreatedAtAction(nameof(GetAll), new { result.Value!.Id },result.Value);
             }
-            return Problem(statusCode: StatusCodes.Status400BadRequest, title: result.Error.Code, detail: result.Error.Description);
+            return Problem(statusCode: result.Error.StatusCode, title: result.Error.Code, detail: result.Error.Description);
         }
 
         [HttpPut("{id}")]

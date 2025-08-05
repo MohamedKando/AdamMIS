@@ -32,19 +32,13 @@ namespace AdamMIS.Controllers
         //#region Category Management
 
         [HttpGet("categories")]
-        [HasPermission(Permissions.ReadCategories)]
+       // [HasPermission(Permissions.ReadCategories)]
         public async Task<ActionResult<IEnumerable<RCategoryResponse>>> GetAllCategories()
         {
-            try
-            {
+           
                 var categories = await _reportService.GetAllCategoriesAsync();
                 return Ok(categories);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting all categories");
-                return StatusCode(500, "Internal server error");
-            }
+            
         }
 
         [HttpGet("categories/{id}")]
@@ -85,22 +79,17 @@ namespace AdamMIS.Controllers
             }
         }
         [HttpDelete("categories/{id}")]
-        [HasPermission(Permissions.DeleteCategories)]
+        //[HasPermission(Permissions.DeleteCategories)]
         public async Task<ActionResult> DeleteCategory(int id)
         {
-            try
-            {
+           
                 var result = await _reportService.DeleteCategoryAsync(id);
-                if (!result)
-                    return NotFound("Report not found");
+                if (result.IsFailure)
+                    return Problem(statusCode: StatusCodes.Status404NotFound, title: result.Error.Code, detail: result.Error.Description);
 
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting report {ReportId}", id);
-                return StatusCode(500, "Internal server error");
-            }
+                return Ok(true);
+            
+
         }
 
         //[HttpPut("categories/{id}")]

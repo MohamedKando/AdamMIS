@@ -2,12 +2,25 @@
 {
     public class RolesErrors
     {
-        public static readonly Error DublicatedRole = new Error("Role.DublicatedRole", "There is another role this this name");
+        public static readonly Error DuplicatedRole = new(
+            "Role.DuplicatedRole",
+            "There is another role with this name",
+            StatusCodes.Status409Conflict);
 
-        public static readonly Error PermissionNotFound = new Error("Permission.NotFound", " one or more of your entired permission is not exist");
-        public static readonly Error RoleNotFound = new Error("Role.NotFound", " Tone or more of your entired permission are not exist");
+        public static readonly Error PermissionNotFound = new(
+            "Permission.NotFound",
+            "One or more of the entered permissions do not exist",
+            StatusCodes.Status404NotFound);
 
-         public static readonly Error UserRoleExist = new Error("Role.RoleExist", " The User already own this role/roles");
+        public static readonly Error RoleNotFound = new(
+            "Role.NotFound",
+            "One or more of the entered roles do not exist",
+            StatusCodes.Status404NotFound);
+
+        public static readonly Error UserRoleExist = new(
+            "Role.RoleExist",
+            "The user already has this role/roles",
+            StatusCodes.Status400BadRequest);
 
 
 

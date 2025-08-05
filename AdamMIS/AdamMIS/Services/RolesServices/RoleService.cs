@@ -54,7 +54,7 @@ namespace AdamMIS.Services.RolesServices
             var isExsit = await _roleManager.RoleExistsAsync(request.Name);
             if (isExsit)
             {
-                return Result.Failure<RolesDetailsReponse>(RolesErrors.DublicatedRole);
+                return Result.Failure<RolesDetailsReponse>(RolesErrors.DuplicatedRole);
             }
 
             var allowedPermission = Permissions.GetAllPermissions();
@@ -95,7 +95,7 @@ namespace AdamMIS.Services.RolesServices
 
             // ast5dm el error dh lma t3ml el result pattern 
             var error = result.Errors.First();
-            return Result.Failure<RolesDetailsReponse>(new Error(error.Code, error.Description));
+            return Result.Failure<RolesDetailsReponse>(new Error(error.Code, error.Description,0));
         }
 
         public async Task<bool> UpdateRoleAsync(string id ,RoleRequest request)

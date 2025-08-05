@@ -66,7 +66,7 @@ namespace AdamMIS.Controllers
 
             var result = await _userService.AddUserAsync(request);
             if (!result.IsSuccess)
-                return Problem(statusCode: StatusCodes.Status400BadRequest, title: result.Error.Code, detail: result.Error.Description);
+                return Problem(statusCode: result.Error.StatusCode, title: result.Error.Code, detail: result.Error.Description);
             return CreatedAtAction(nameof(GetAllUsers), new { result.Value!.Id }, result.Value);
 
 
@@ -80,7 +80,7 @@ namespace AdamMIS.Controllers
             var result = await _userService.ToggleStatusAsync(id);
 
             if (!result.IsSuccess)
-                Problem(statusCode: StatusCodes.Status400BadRequest, title: result.Error.Code, detail: result.Error.Description);
+                Problem(statusCode: result.Error.StatusCode, title: result.Error.Code, detail: result.Error.Description);
             return NoContent();
         }
 
@@ -98,7 +98,7 @@ namespace AdamMIS.Controllers
                 return NoContent();
             }
 
-            return Problem(statusCode: StatusCodes.Status400BadRequest, title: result.Error.Code, detail: result.Error.Description);
+            return Problem(statusCode: result.Error.StatusCode, title: result.Error.Code, detail: result.Error.Description);
         }
 
 
@@ -141,7 +141,7 @@ namespace AdamMIS.Controllers
         {
             var result = await _userService.AdminResetPasswordAsync(request);
             if (!result.IsSuccess)
-                return Problem(statusCode: StatusCodes.Status400BadRequest, title: result.Error.Code, detail: result.Error.Description);
+                return Problem(statusCode: result.Error.StatusCode, title: result.Error.Code, detail: result.Error.Description);
             return NoContent();
         }
 
@@ -154,7 +154,7 @@ namespace AdamMIS.Controllers
         {
             var result = await _userService.ChangePasswordAsync(User.GetUserId(), request);
             if (!result.IsSuccess)
-                return Problem(statusCode: StatusCodes.Status400BadRequest, title: result.Error.Code, detail: result.Error.Description);
+                return Problem(statusCode: result.Error.StatusCode, title: result.Error.Code, detail: result.Error.Description);
             return NoContent();
         }
 
@@ -164,7 +164,7 @@ namespace AdamMIS.Controllers
         {
             var result = await _userService.UpdateProfileAsync(id, request);
             if (!result.IsSuccess)
-                return Problem(statusCode: StatusCodes.Status400BadRequest, title: result.Error.Code, detail: result.Error.Description);
+                return Problem(statusCode: result.Error.StatusCode, title: result.Error.Code, detail: result.Error.Description);
             return Ok(result.Value);
         }
 
