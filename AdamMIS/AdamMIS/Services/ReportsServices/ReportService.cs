@@ -290,6 +290,32 @@ namespace AdamMIS.Services.ReportsServices
 
             return userReports;
         }
+
+        public async Task<IEnumerable<UserReportResponse>> GetAllUserReportsAsync()
+        {
+            var allUserReports = await _context.UserReports
+                .Include(ur => ur.User)
+                .Include(ur => ur.Report)
+                .ThenInclude(r => r.Category)
+                .Where(ur => ur.Report.IsActive) // Only active reports
+                .Select(ur => new UserReportResponse
+                {
+                    Id = ur.Id,
+                    UserId = ur.UserId,
+                    UserName = ur.User.UserName ?? "",
+                    ReportId = ur.ReportId,
+                    ReportFileName = ur.Report.FileName,
+                    CategoryName = ur.Report.Category.Name,
+                    AssignedAt = ur.AssignedAt,
+                    AssignedBy = ur.AssignedBy,
+                    IsActive = ur.Report.IsActive
+                })
+                .OrderByDescending(ur => ur.AssignedAt) // Most recent first
+                .ToListAsync();
+
+            return allUserReports;
+        }
+
         public async Task<IEnumerable<UserReportResponse>> AssignReportsToUsersAsync(UserReportRequest request, string assignedBy)
         {
             try

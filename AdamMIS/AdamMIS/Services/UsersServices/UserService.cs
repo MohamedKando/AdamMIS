@@ -1,4 +1,5 @@
 ﻿
+using AdamMIS.Contract.Departments;
 using AdamMIS.Contract.UserRole;
 using AdamMIS.Contract.Users;
 using AdamMIS.Errors;
@@ -6,6 +7,7 @@ using AdamMIS.Services.RolesServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Query;
+using System.Collections.Generic;
 
 namespace AdamMIS.Services.UsersServices
 {
@@ -202,14 +204,7 @@ namespace AdamMIS.Services.UsersServices
             return Result.Success();
         }
 
-        public async Task<IEnumerable<string>> GetAllDepartmentsAsync()
-        {
-            var departments = await _context.Departments
-                .Select(r => r.Name)
-                .ToListAsync();
 
-            return departments;
-        }
 
 
 
@@ -367,6 +362,41 @@ namespace AdamMIS.Services.UsersServices
             await _context.SaveChangesAsync();
 
             return Result.Success(relativePath);
+        }
+
+
+
+
+
+
+
+
+
+        //deparment
+
+        public async Task<IEnumerable<DepartmentResponse>> GetAllDepartmentsAsync()
+        {
+            var departments = await _context.Departments
+                
+                .ToListAsync();
+
+            var response = departments.Adapt< IEnumerable<DepartmentResponse>>();
+
+            return response;    
+        }
+
+
+        public async Task<Result<IEnumerable<UserResponse>>> GetAllDepartmentUsersAsync(int deparmentId)
+        {
+            var exsit = await _context.Departments.FindAsync(deparmentId);
+            if (exsit==null)
+            {
+                return Result.Failure<IEnumerable<UserResponse>>(DepartmentErrors.DepartmentNotFound);
+            }
+            var users = await _context.Users.Include(x => x.Department).Where(d => d.DepartmentId == deparmentId).ToArrayAsync();
+
+            var response = users.Adapt< IEnumerable<UserResponse>>();
+            return Result.Success(response);
         }
 
     }

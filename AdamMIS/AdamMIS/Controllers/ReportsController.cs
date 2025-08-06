@@ -282,6 +282,23 @@ namespace AdamMIS.Controllers
         }
 
 
+        [HttpGet("user-reports/users")]
+        //[HasPermission(Permissions.ReadReports)]
+        public async Task<ActionResult<IEnumerable<UserReportResponse>>> GetUserAllReports()
+        {
+            try
+            {
+                var userReports = await _reportService.GetAllUserReportsAsync();
+                return Ok(userReports);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user reports for user {UserId}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+
         [HttpGet("user-reports/report/{reportId}")]
         public async Task<ActionResult<IEnumerable<UserReportResponse>>> GetReportUsers(int reportId)
         {

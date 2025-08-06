@@ -2,6 +2,7 @@
 using AdamMIS.Authentications;
 using AdamMIS.Authentications.Filters;
 using AdamMIS.Contract.Authentications;
+using AdamMIS.Contract.Departments;
 using AdamMIS.Contract.UserRole;
 using AdamMIS.Contract.Users;
 using AdamMIS.Services.AuthServices;
@@ -103,15 +104,6 @@ namespace AdamMIS.Controllers
 
 
 
-        [HttpGet("departments")]
-        public async Task<IEnumerable<string>> GetAllDepartment()
-        {
-            var departments = await _userService.GetAllDepartmentsAsync();
-            return departments;
-    
-        }
-
-
 
 
 
@@ -176,6 +168,39 @@ namespace AdamMIS.Controllers
                 return Ok(new { photoPath = result.Value });
             return  NoContent();
         }
+
+
+
+
+
+
+
+
+        //departments 
+        [HttpGet("departments")]
+
+        public async Task<IEnumerable<DepartmentResponse>> GetAllDepartment()
+        {
+            var departments = await _userService.GetAllDepartmentsAsync();
+            return departments;
+
+        }
+
+
+        [HttpGet("department-users/{categoryId}")]
+        public async Task<ActionResult<IEnumerable<UserResponse>>> GetAllDepartmentUsers(int categoryId)
+        {
+            var result = await _userService.GetAllDepartmentUsersAsync(categoryId);
+
+            if (result.IsFailure)
+                return Problem(result.Error.Description,result.Error.Code,result.Error.StatusCode);
+
+            return Ok(result.Value);
+        }
+
+
+
+
 
     }
 

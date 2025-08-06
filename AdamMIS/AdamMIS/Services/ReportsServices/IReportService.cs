@@ -1,4 +1,5 @@
 ﻿using AdamMIS.Contract.Reports;
+using AdamMIS.Contract.Users;
 
 namespace AdamMIS.Services.ReportsServices
 {
@@ -24,11 +25,13 @@ namespace AdamMIS.Services.ReportsServices
 
 
 
+
             // User Report Assignment
             Task<IEnumerable<UserReportResponse>> AssignReportsToUsersAsync(UserReportRequest request, string assignedBy);
             Task<bool> RemoveUserReportAssignmentAsync(int userReportId);
             Task<IEnumerable<UserReportResponse>> GetUserReportsAsync(string userId);
             Task<IEnumerable<UserReportResponse>> GetReportUsersAsync(int reportId);
+            Task<IEnumerable<UserReportResponse>> GetAllUserReportsAsync();
 
 
 
@@ -36,6 +39,10 @@ namespace AdamMIS.Services.ReportsServices
         //Task<byte[]?> GetReportFileAsync(int reportId);
         //Task<string?> GetReportFilePathAsync(int reportId);
         Task<Result> ClearAllReportsAsync(CancellationToken cancellationToken);
+
+
+
+
 
         }
     

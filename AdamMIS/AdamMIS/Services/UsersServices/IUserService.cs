@@ -1,4 +1,5 @@
-﻿using AdamMIS.Contract.UserRole;
+﻿using AdamMIS.Contract.Departments;
+using AdamMIS.Contract.UserRole;
 using AdamMIS.Contract.Users;
 
 namespace AdamMIS.Services.UsersServices
@@ -13,7 +14,7 @@ namespace AdamMIS.Services.UsersServices
         Task<Result> ToggleStatusAsync(string id);
         Task<Result> UpdateUserRolesAsync(UserRoleRequest request);
 
-        Task<IEnumerable<string>> GetAllDepartmentsAsync();
+
 
         //User Profile
         Task<Result<UserResponse>> GetUserProfileByIdAsync(string userId);
@@ -22,6 +23,12 @@ namespace AdamMIS.Services.UsersServices
 
         Task<Result<UserResponse>> UpdateProfileAsync(string id, UpdateUserProfileRequest request);
         Task<Result<string>> UploadUserPhotoAsync(UploadUserPhotoRequest request);
+
+
+
+        //departments
+        Task<IEnumerable<DepartmentResponse>> GetAllDepartmentsAsync();
+        Task<Result<IEnumerable<UserResponse>>> GetAllDepartmentUsersAsync(int deparmentId);
 
 
 
