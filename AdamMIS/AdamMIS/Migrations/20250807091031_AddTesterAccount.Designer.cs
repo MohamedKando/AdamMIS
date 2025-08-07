@@ -4,6 +4,7 @@ using AdamMIS.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdamMIS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250807091031_AddTesterAccount")]
+    partial class AddTesterAccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,9 +100,6 @@ namespace AdamMIS.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("InternalPhone")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsDisabled")
                         .HasColumnType("bit");
 
@@ -166,7 +166,7 @@ namespace AdamMIS.Migrations
                             IsDisabled = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "MOHAMEDKANDIL",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIptpj2DNbSuQ/lgQoZ9lf1yTvp89EkhQj0zs6atj0jbW7jMgsToVJE7y80uN4VhtA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGVyqLk2t9TzWUyhKs/vbFmndUolhxALXlgBLDLyL+W6iEkwQ92u8lZYH+GpHaXMgQ==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "75B0F3ACD7DE4D088DA0594E3ACDC1EF",
                             TwoFactorEnabled = false,
@@ -181,7 +181,7 @@ namespace AdamMIS.Migrations
                             IsDisabled = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "TESTER",
-                            PasswordHash = "AQAAAAIAAYagAAAAEL2pCSZhUek2+eQqmCV1OOn//z6zm5DK0JgUNZSLqsdYQ4zKFU0o8EzVUTggOQ960g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDXpfNVnGnTEf99RD0t5l+TDA4O9ES7gWokTvGl3m4U1jrsO3KsvV8b90Vpk8r2n5w==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "75B0F3ACD7DE4D088DA0594E3ACDC1EF",
                             TwoFactorEnabled = false,

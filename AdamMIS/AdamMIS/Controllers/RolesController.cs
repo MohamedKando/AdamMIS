@@ -17,7 +17,7 @@ namespace AdamMIS.Controllers
         }
 
         [HttpGet("")]
-        [HasPermission(Permissions.ReadRoles)]
+        //[HasPermission(Permissions.ReadRoles)]
         public async Task<IActionResult> GetAll([FromQuery]bool? includeDisabled )
         {
             var response = await _roleService.GetAllAsync(includeDisabled);

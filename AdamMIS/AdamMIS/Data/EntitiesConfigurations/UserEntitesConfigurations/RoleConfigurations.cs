@@ -24,6 +24,7 @@ namespace AdamMIS.Data.EntitiesConfigurations.UserEntitesConfigurations
                     IsDeafult=true
                     
                 }
+
                 ]);
         }
     }

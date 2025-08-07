@@ -5,10 +5,10 @@
         public string Id { get; set; } = string.Empty;
         public string UserName {  get; set; } =string.Empty;
         public bool IsDisabled { get; set; }
-        public string? Email { get; set; } = string.Empty;
         public string? Title { get; set; }
         public string? DepartmentName { get; set; }
-
+        public string? InternalPhone {  get; set; }
+        public string? UserPhone { get; set; }
         public string? PhotoPath { get; set; }
         public IEnumerable<string> Roles { get; set; } = Enumerable.Empty<string>();
     }

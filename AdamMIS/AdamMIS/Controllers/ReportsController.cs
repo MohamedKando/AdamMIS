@@ -79,7 +79,7 @@ namespace AdamMIS.Controllers
             }
         }
         [HttpDelete("categories/{id}")]
-        //[HasPermission(Permissions.DeleteCategories)]
+        [HasPermission(Permissions.DeleteCategories)]
         public async Task<ActionResult> DeleteCategory(int id)
         {
            
@@ -92,33 +92,33 @@ namespace AdamMIS.Controllers
 
         }
 
-        //[HttpPut("categories/{id}")]
-        //public async Task<ActionResult<RCategoryResponse>> UpdateCategory(int id, [FromBody] RCategoryRequest request)
-        //{
-        //    try
-        //    {
-        //        if (!ModelState.IsValid)
-        //            return BadRequest(ModelState);
+        [HttpPut("categories/{id}")]
+        public async Task<ActionResult<RCategoryResponse>> UpdateCategory(int id, [FromBody] RCategoryRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-        //        var category = await _reportService.UpdateCategoryAsync(id, request);
-        //        return Ok(category);
-        //    }
-        //    catch (ArgumentException ex)
-        //    {
-        //        return NotFound(ex.Message);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error updating category {CategoryId}", id);
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
+                var category = await _reportService.UpdateCategoryAsync(id, request);
+                return Ok(category);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating category {CategoryId}", id);
+                return StatusCode(500, "Internal server error");
+            }
+        }
 
 
         //#region Report Management
 
         [HttpGet("reports")]
-      //  [HasPermission(Permissions.ReadReports)]
+       // [HasPermission(Permissions.ReadReports)]
         public async Task<ActionResult<IEnumerable<ReportResponse>>> GetAllReports()
         {
             try
@@ -136,7 +136,7 @@ namespace AdamMIS.Controllers
 
 
         [HttpGet("reports/{id}")]
-       // [HasPermission(Permissions.ReadReports)]
+        [HasPermission(Permissions.ReadReports)]
         public async Task<ActionResult<ReportResponse>> GetReportById(int id)
         {
             try
@@ -157,7 +157,7 @@ namespace AdamMIS.Controllers
 
 
         [HttpGet("reports/category/{categoryId}")]
-       // [HasPermission(Permissions.ReadReports)]
+        [HasPermission(Permissions.ReadReports)]
         public async Task<ActionResult<IEnumerable<ReportResponse>>> GetReportsByCategory(int categoryId)
         {
             try
@@ -266,7 +266,7 @@ namespace AdamMIS.Controllers
 
 
         [HttpGet("user-reports/user/{userId}")]
-        //[HasPermission(Permissions.ReadReports)]
+        [HasPermission(Permissions.ReadReports)]
         public async Task<ActionResult<IEnumerable<UserReportResponse>>> GetUserReports(string userId)
         {
             try
@@ -283,7 +283,7 @@ namespace AdamMIS.Controllers
 
 
         [HttpGet("user-reports/users")]
-        //[HasPermission(Permissions.ReadReports)]
+        [HasPermission(Permissions.ReadReports)]
         public async Task<ActionResult<IEnumerable<UserReportResponse>>> GetUserAllReports()
         {
             try

@@ -4,6 +4,7 @@ using AdamMIS.Contract.UserRole;
 using AdamMIS.Contract.Users;
 using AdamMIS.Errors;
 using AdamMIS.Services.RolesServices;
+using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Query;
@@ -230,7 +231,8 @@ namespace AdamMIS.Services.UsersServices
                 Id = user.Id,
                 UserName = user.UserName!,
                 IsDisabled = user.IsDisabled,
-                Email = user.Email, // ✅ Add this line
+                InternalPhone=user.InternalPhone,
+                UserPhone=user.PhoneNumber,
                 Title = user.Title,
                 DepartmentName = user.Department?.Name,
                 Roles = roles,
@@ -292,8 +294,7 @@ namespace AdamMIS.Services.UsersServices
 
             if (!string.IsNullOrEmpty(request.UserName))
                 user.UserName = request.UserName;
-            if (!string.IsNullOrEmpty(request.Email))
-                user.Email = request.Email;
+
 
             if (!string.IsNullOrEmpty(request.Title))
                 user.Title = request.Title;
@@ -317,7 +318,8 @@ namespace AdamMIS.Services.UsersServices
                 IsDisabled = user.IsDisabled,
                 Title = user.Title,
                 DepartmentName = request.Department,
-                Email = request.Email,
+                UserPhone=request.USerPhone,
+                InternalPhone=request.InternalPhone,    
                 Roles = roles
             });
         }

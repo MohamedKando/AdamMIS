@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdamMIS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250805090432_UpdateRCategoryRelation")]
-    partial class UpdateRCategoryRelation
+    [Migration("20250807123745_UpdateUserTablePHoneINternal")]
+    partial class UpdateUserTablePHoneINternal
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -100,6 +100,9 @@ namespace AdamMIS.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("InternalPhone")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDisabled")
                         .HasColumnType("bit");
 
@@ -165,12 +168,27 @@ namespace AdamMIS.Migrations
                             EmailConfirmed = true,
                             IsDisabled = false,
                             LockoutEnabled = false,
-                            NormalizedUserName = "MOHAMEDKANDO",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIMlamsozskdH61UM5CwcHHZXYjLJJ2EwwTS7/pNCshHIozPgrQPsSAi04X6Iu89tg==",
+                            NormalizedUserName = "MOHAMEDKANDIL",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIptpj2DNbSuQ/lgQoZ9lf1yTvp89EkhQj0zs6atj0jbW7jMgsToVJE7y80uN4VhtA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "75B0F3ACD7DE4D088DA0594E3ACDC1EF",
                             TwoFactorEnabled = false,
-                            UserName = "MohamedKando"
+                            UserName = "MohamedKandil"
+                        },
+                        new
+                        {
+                            Id = "03174B27-D47B-4C12-94AD-676B3BF14BV2",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "07C2800E-4457-4360-8102-A99EC48944VD",
+                            EmailConfirmed = true,
+                            IsDisabled = false,
+                            LockoutEnabled = false,
+                            NormalizedUserName = "TESTER",
+                            PasswordHash = "AQAAAAIAAYagAAAAEL2pCSZhUek2+eQqmCV1OOn//z6zm5DK0JgUNZSLqsdYQ4zKFU0o8EzVUTggOQ960g==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "75B0F3ACD7DE4D088DA0594E3ACDC1EF",
+                            TwoFactorEnabled = false,
+                            UserName = "Tester"
                         });
                 });
 
@@ -595,6 +613,11 @@ namespace AdamMIS.Migrations
                         {
                             UserId = "03174B27-D47B-4C12-94AD-676B3BF14BC2",
                             RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
+                        },
+                        new
+                        {
+                            UserId = "03174B27-D47B-4C12-94AD-676B3BF14BV2",
+                            RoleId = "35904F06-0FD5-47F3-ACF2-23B77C14F947"
                         });
                 });
 
@@ -659,7 +682,7 @@ namespace AdamMIS.Migrations
                     b.HasOne("AdamMIS.Entities.ReportsEnitites.RCategories", "Category")
                         .WithMany("Reports")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Category");

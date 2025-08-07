@@ -12,7 +12,14 @@ namespace AdamMIS.Data.EntitiesConfigurations.UserEntitesConfigurations
                 UserId=DeafultUsers.AdminId,
                 RoleId=DeafultRole.AdminRoleId,
             
-            });
+            },
+            new IdentityUserRole<string>
+            {
+                UserId = DeafultUsers.TesterId,
+                RoleId = DeafultRole.AdminRoleId,
+
+            }
+            );
 
 
         }

@@ -12,6 +12,8 @@ namespace AdamMIS.Entities
         public int? DepartmentId { get; set; } // FK
         public string? PhotoPath { get; set; }
         public Department? Department { get; set; } // Navigation property
+
+        public string? InternalPhone { get; set; }
         public ICollection<UserReports> UserReports { get; set; } = new List<UserReports>();
         public ICollection<ApplicationUserRole> UserRoles { get; set; } = new List<ApplicationUserRole>();
     }

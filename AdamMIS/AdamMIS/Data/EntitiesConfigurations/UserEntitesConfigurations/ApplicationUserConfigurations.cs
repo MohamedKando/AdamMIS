@@ -24,7 +24,16 @@ namespace AdamMIS.Data.EntitiesConfigurations.UserEntitesConfigurations
                 EmailConfirmed=true,
                 PasswordHash=passwordHasher.HashPassword(null!,DeafultUsers.AdminPassword)
             });
-
+            builder.HasData(new ApplicationUser
+            {
+                Id = DeafultUsers.TesterId,
+                UserName = DeafultUsers.TesterName,
+                SecurityStamp = DeafultUsers.AdminSecurityStamp,
+                NormalizedUserName = DeafultUsers.TesterName.ToUpper(),
+                ConcurrencyStamp = DeafultUsers.TesterConcurrencyStamp,
+                EmailConfirmed = true,
+                PasswordHash = passwordHasher.HashPassword(null!, DeafultUsers.TesterPassword)
+            });
         }
     }
 }
