@@ -1,6 +1,9 @@
 ﻿using AdamMIS.Abstractions;
 using AdamMIS.Contract.Authentications;
+using AdamMIS.Contract.SystemLogs;
+using AdamMIS.Entities.SystemLogs;
 using AdamMIS.Services.AuthServices;
+using AdamMIS.Services.LogServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,9 +14,11 @@ namespace AdamMIS.Controllers
     public class AuthController : ControllerBase
     {
         public readonly IAuthService _authService;
-        public AuthController(IAuthService authService)
+        private readonly ILoggingService _logginservice;
+        public AuthController(IAuthService authService, ILoggingService loggingService)
         {
             _authService = authService;
+            _logginservice = loggingService;
         }
         [HttpPost("")]
 
@@ -22,11 +27,21 @@ namespace AdamMIS.Controllers
 
             var authResult = await _authService.GetTokenAsync(request.UserName, request.Password, cancellationToken);
 
+
             if (authResult.IsFailure)
             {
                 return Problem(statusCode: authResult.Error.StatusCode, title:authResult.Error.Code,detail:authResult.Error.Description);
             }
-
+            await _logginservice.LogAsync(new CreateLogRequest
+            {
+                Username = request.UserName,
+                ActionType = "Login",
+                EntityName = "Authentication",
+                EntityId = "N/A",
+                Description = "User logged in",
+                
+                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
+            });
 
 
             return Ok(authResult.Value);

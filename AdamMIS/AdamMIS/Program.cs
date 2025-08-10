@@ -3,6 +3,7 @@
 
 
 
+using AdamMIS.Abstractions.LoggingAbstractions;
 using AdamMIS.Authentications.Filters;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.FileProviders;
@@ -18,16 +19,17 @@ var connectionstring = builder.Configuration.GetConnectionString("MyConnection")
     throw new InvalidOperationException(" Connection string 'MyConnection' Not Found.");
 
 // Add EF Core with Identity support
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<AppDbContext>((sp, options) =>
+{
     options.UseSqlServer(connectionstring, sqlOptions =>
     {
         sqlOptions.CommandTimeout(90); // default is 30
-       // sqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
     })
-    .LogTo(Console.WriteLine, LogLevel.Information));
+    .LogTo(Console.WriteLine, LogLevel.Information);
 
-
-
+    // Add logging interceptor
+   // options.AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>());
+});
 builder.Services.AddDependency(builder.Configuration);
 builder.Services.AddCors(options =>
 {
@@ -45,6 +47,14 @@ builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration);
 }
 );
+
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor
+                              | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -69,6 +79,7 @@ app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthorization();
+app.UseForwardedHeaders();
 //app.MapIdentityApi<ApplicationUser>();
 app.MapControllers();
 //app.UseExceptionHandler();

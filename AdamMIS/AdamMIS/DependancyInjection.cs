@@ -1,6 +1,8 @@
-﻿using AdamMIS.Authentications;
+﻿using AdamMIS.Abstractions.LoggingAbstractions;
+using AdamMIS.Authentications;
 using AdamMIS.Authentications.Filters;
 using AdamMIS.Services.AuthServices;
+using AdamMIS.Services.LogServices;
 using AdamMIS.Services.ReportsServices;
 using AdamMIS.Services.RolesServices;
 using AdamMIS.Services.UsersServices;
@@ -28,9 +30,14 @@ namespace AdamMIS
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
-
+            services.AddScoped<ILoggingService, LoggingService>();
+            services.AddScoped<ILoggingContext, LoggingContext>();
+            services.AddScoped<AuditSaveChangesInterceptor>();
             services.AddScoped<PermissionsSeeder>();
 
+
+
+            services.AddHttpContextAccessor();
             services.AddProblemDetails();
             return services;
         }

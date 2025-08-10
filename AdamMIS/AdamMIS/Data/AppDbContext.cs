@@ -2,6 +2,7 @@
 
 
 using AdamMIS.Entities.ReportsEnitites;
+using AdamMIS.Entities.SystemLogs;
 
 namespace AdamMIS.Data
 {
@@ -17,6 +18,7 @@ namespace AdamMIS.Data
         public DbSet<UserReports> UserReports { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<ApplicationUserRole> ApplicationUserRole { get; set; }
+        public DbSet<SystemLog> SystemLog { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
