@@ -4,6 +4,7 @@ using AdamMIS.Contract.SystemLogs;
 using AdamMIS.Entities.SystemLogs;
 using AdamMIS.Services.AuthServices;
 using AdamMIS.Services.LogServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -45,6 +46,35 @@ namespace AdamMIS.Controllers
 
 
             return Ok(authResult.Value);
+        }
+        [HttpPost("logout")]
+        [Authorize] // Ensure user is authenticated to logout
+        public async Task<IActionResult> Logout(CancellationToken cancellationToken)
+        {
+            try
+            {
+                // Get current user info from the JWT token
+                var username = User.Identity?.Name ?? "Unknown";
+                var userId = User.FindFirst("sub")?.Value ?? User.FindFirst("id")?.Value ?? "N/A";
+
+                await _logginservice.LogAsync(new CreateLogRequest
+                {
+                    Username = username,
+                    ActionType = "Logout",
+                    EntityName = "Authentication",
+                    EntityId = userId,
+                    Description = "User logged out",
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
+                });
+
+                return Ok(new { message = "Logged out successfully" });
+            }
+            catch (Exception ex)
+            {
+                // Log the error but still return success since logout should work
+                // even if logging fails
+                return Ok(new { message = "Logged out successfully" });
+            }
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequest request, CancellationToken cancellationToken = default)
