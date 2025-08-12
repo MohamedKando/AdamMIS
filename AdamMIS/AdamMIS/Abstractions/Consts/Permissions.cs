@@ -31,6 +31,12 @@
         public const string DeleteRoles = "Delete Roles";
 
 
+        //logs
+        public const string DeleteLogs = "Delete Logs";
+
+
+
+
 
 
         public const string Result = "Read Result";
@@ -41,14 +47,20 @@
 
         public const string ViewAdminManager = "View Admin Manager";
 
+        public const string AuditsLogs = "View Audits Logs";
+
+
+
+
+        // Get All permission to display in frontend
         public static IList<string?> GetAllPermissions()
         {
-
             return typeof(Permissions)
-            .GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.FlattenHierarchy)
-            .Where(fi => fi.IsLiteral && !fi.IsInitOnly && fi.FieldType == typeof(string))
-            .Select(fi => fi.GetRawConstantValue() as string)
-            .ToList();
+                .GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.FlattenHierarchy)
+                .Where(fi => fi.IsLiteral && !fi.IsInitOnly && fi.FieldType == typeof(string))
+                .Select(fi => fi.GetRawConstantValue() as string)
+                .Where(value => value != Permissions.DeleteLogs) 
+                .ToList();
         }
     }
 }
