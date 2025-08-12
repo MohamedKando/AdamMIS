@@ -53,7 +53,7 @@ namespace AdamMIS.Services.AuthServices
                 //FirstName = user.FirstName,
                 //LastName = user.LastName,
                 Token = token,
-                ExpiresIn = expireIn * 60
+                ExpiresIn = expireIn * 600
             };
             return Result<AuthResponse>.Success(response);
         }
