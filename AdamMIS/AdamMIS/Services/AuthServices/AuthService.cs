@@ -1,8 +1,10 @@
 ﻿using AdamMIS.Authentications;
 using AdamMIS.Contract.Authentications;
+using AdamMIS.Entities.SystemLogs;
 using AdamMIS.Errors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace AdamMIS.Services.AuthServices
 {
@@ -11,14 +13,19 @@ namespace AdamMIS.Services.AuthServices
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IJwtProvider _jwtProvider;
         private readonly AppDbContext _context;
-        public AuthService(UserManager<ApplicationUser> userManager, IJwtProvider jwtProvider, AppDbContext context)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AuthService(UserManager<ApplicationUser> userManager, IJwtProvider jwtProvider, AppDbContext context, IHttpContextAccessor httpContextAccessor )
         {
             _userManager = userManager;
             _jwtProvider = jwtProvider;
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<Result<AuthResponse>> GetTokenAsync(string name, string password, CancellationToken cancellationToken = default)
         {
+            var ip = _httpContextAccessor.HttpContext?.Request?.Headers["X-Forwarded-For"].FirstOrDefault()
+         ?? _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.MapToIPv4().ToString()
+         ?? "Unknown";
             //checking if the user exist in the database or not
             var user = await _userManager.FindByNameAsync(name);
             if (user == null)
@@ -55,6 +62,33 @@ namespace AdamMIS.Services.AuthServices
                 Token = token,
                 ExpiresIn = expireIn * 600
             };
+
+            var existingLog = await _context.acivityLogs
+                .FirstOrDefaultAsync(l => l.UserId == user.Id, cancellationToken);
+
+            if (existingLog == null)
+            {
+                var log = new AcivityLogs
+                {
+                    UserId = user.Id,
+                    UserName = name,
+                    LoginTime = DateTime.UtcNow,
+                    LastActivityTime = DateTime.UtcNow,
+                    IsOnline = true,
+                    IpAddress = ip
+                };
+                _context.acivityLogs.Add(log);
+            }
+            else
+            {
+                existingLog.LastActivityTime = DateTime.UtcNow;
+                existingLog.IsOnline = true;
+                existingLog.LoginTime = DateTime.UtcNow;
+                existingLog.SessionTime = existingLog.LoginTime-existingLog.LastActivityTime  ;
+                existingLog.IpAddress = ip;
+            }
+
+            await _context.SaveChangesAsync();
             return Result<AuthResponse>.Success(response);
         }
         public async Task<Result<AuthResponse>> RigesterAsync(RegisterRequest request, CancellationToken cancellationToken = default)

@@ -20,6 +20,8 @@ namespace AdamMIS.Data
         public DbSet<ApplicationUserRole> ApplicationUserRole { get; set; }
         public DbSet<SystemLog> SystemLog { get; set; }
 
+        public DbSet<AcivityLogs> acivityLogs { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

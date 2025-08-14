@@ -6,7 +6,11 @@ namespace AdamMIS.Authentications
     {
         public static string GetUserId(this ClaimsPrincipal user)
         {
-            return user.FindFirstValue(ClaimTypes.NameIdentifier); // usually the ID claim
+            return user.FindFirstValue(ClaimTypes.NameIdentifier)!; // usually the ID claim
+        }
+        public static string GetUsername(this ClaimsPrincipal user)
+        {
+            return user.FindFirstValue(ClaimTypes.Name)!;
         }
     }
 }

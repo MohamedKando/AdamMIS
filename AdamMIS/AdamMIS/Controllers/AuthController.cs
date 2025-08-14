@@ -1,4 +1,5 @@
 ﻿using AdamMIS.Abstractions;
+using AdamMIS.Authentications;
 using AdamMIS.Contract.Authentications;
 using AdamMIS.Contract.SystemLogs;
 using AdamMIS.Entities.SystemLogs;
@@ -7,6 +8,7 @@ using AdamMIS.Services.LogServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AdamMIS.Controllers
 {
@@ -16,10 +18,12 @@ namespace AdamMIS.Controllers
     {
         public readonly IAuthService _authService;
         private readonly ILoggingService _logginservice;
-        public AuthController(IAuthService authService, ILoggingService loggingService)
+        private readonly AppDbContext _context;
+        public AuthController(IAuthService authService, ILoggingService loggingService, AppDbContext context)
         {
             _authService = authService;
             _logginservice = loggingService;
+            _context = context;
         }
         [HttpPost("")]
 
@@ -51,11 +55,14 @@ namespace AdamMIS.Controllers
         [Authorize] // Ensure user is authenticated to logout
         public async Task<IActionResult> Logout(CancellationToken cancellationToken)
         {
+            var ip = HttpContext.Request?.Headers["X-Forwarded-For"].FirstOrDefault()
+            ?? HttpContext.Connection?.RemoteIpAddress?.MapToIPv4().ToString()
+            ?? "Unknown";
             try
             {
                 // Get current user info from the JWT token
                 var username = User.Identity?.Name ?? "Unknown";
-                var userId = User.FindFirst("sub")?.Value ?? User.FindFirst("id")?.Value ?? "N/A";
+                var userId = User.GetUserId();
 
                 await _logginservice.LogAsync(new CreateLogRequest
                 {
@@ -64,8 +71,20 @@ namespace AdamMIS.Controllers
                     EntityName = "Authentication",
                     EntityId = userId,
                     Description = "User logged out",
-                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
+                    IpAddress = ip
                 });
+
+                var log = await _context.acivityLogs
+                    .FirstOrDefaultAsync(l => l.UserId == userId && l.IsOnline, cancellationToken);
+
+
+                if (log != null)
+                {
+                    log.LastActivityTime = DateTime.UtcNow;
+                    log.IsOnline = false;
+                    log.SessionTime = log.LastActivityTime-log.LoginTime;
+                    await _context.SaveChangesAsync();
+                }
 
                 return Ok(new { message = "Logged out successfully" });
             }
@@ -87,6 +106,26 @@ namespace AdamMIS.Controllers
             else
                 return Ok(authResult.Value);
 
+        }
+
+        [HttpPost("heartbeat")]
+        //[Authorize]
+        public async Task<IActionResult> Heartbeat()
+        {
+            var userId = User.GetUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            var log = await _context.acivityLogs
+                .FirstOrDefaultAsync(l => l.UserId == userId && l.IsOnline);
+
+            if (log != null)
+            {
+                log.LastActivityTime = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok(new { message = "Heartbeat received" });
         }
         [HttpDelete("ClearAll")]
         public async Task<IActionResult> ClearUsers(CancellationToken cancellationToken)

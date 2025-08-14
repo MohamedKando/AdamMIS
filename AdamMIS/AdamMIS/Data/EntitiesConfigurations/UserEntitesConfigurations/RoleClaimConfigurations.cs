@@ -14,7 +14,7 @@ namespace AdamMIS.Data.EntitiesConfigurations.UserEntitesConfigurations
             {
                 adminClaims.Add(new IdentityRoleClaim<string>
                 {
-                    Id = i + 1,
+                    Id = -(i + 1),
                     ClaimType = Permissions.Type,
                     ClaimValue = permissions[i],
                     RoleId=DeafultRole.AdminRoleId

@@ -9,10 +9,12 @@ namespace AdamMIS.Controllers
     public class LogsController : Controller
     {
         private readonly ILoggingService _loggingService;
+        private readonly AppDbContext _context;
 
-        public LogsController(ILoggingService loggingService)
+        public LogsController(ILoggingService loggingService, AppDbContext appDbContext)
         {
             _loggingService = loggingService;
+            _context = appDbContext;
         }
 
         [HttpPost("")]
@@ -33,6 +35,16 @@ namespace AdamMIS.Controllers
             var logs = await _loggingService.GetLogsAsync(username, actionType, startDate, endDate,filters);
             return Ok(logs);
         }
+
+
+        [HttpGet("activity-logs")]
+        public async Task<IActionResult> GetActivitylogs()
+        {
+            var logs = await _context.acivityLogs.ToListAsync();
+            return Ok(logs);
+        }
+
+
 
 
         [HttpDelete("ClearAll")]

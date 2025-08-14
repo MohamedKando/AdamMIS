@@ -4,6 +4,7 @@ using AdamMIS.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdamMIS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250813090210_AddingActivityLogTable")]
+    partial class AddingActivityLogTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,7 +169,7 @@ namespace AdamMIS.Migrations
                             IsDisabled = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "MOHAMEDKANDIL",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIShK5at1rABQ5u7MkanNGx2ymIN9YSUBcrPe/mjHwGUDTnvBbaiqLlhx7sdIGWTOw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELbW9ANXI1UIr+xdPaRgym8rddPjsCDAoe6s6qmiCUVvzFX1b48LpNcfsrU+e6D55g==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "75B0F3ACD7DE4D088DA0594E3ACDC1EF",
                             TwoFactorEnabled = false,
@@ -388,9 +391,6 @@ namespace AdamMIS.Migrations
 
                     b.Property<DateTime>("LoginTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<TimeSpan>("SessionTime")
-                        .HasColumnType("time");
 
                     b.Property<string>("UserId")
                         .IsRequired()

@@ -1,4 +1,5 @@
-﻿using AdamMIS.Abstractions.LoggingAbstractions;
+﻿using AdamMIS.Abstractions.BackGroundJobsAbstractions;
+using AdamMIS.Abstractions.LoggingAbstractions;
 using AdamMIS.Authentications;
 using AdamMIS.Authentications.Filters;
 using AdamMIS.Services.AuthServices;
@@ -31,9 +32,11 @@ namespace AdamMIS
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<ILoggingService, LoggingService>();
-            services.AddScoped<ILoggingContext, LoggingContext>();
+
             services.AddScoped<AuditSaveChangesInterceptor>();
             services.AddScoped<PermissionsSeeder>();
+            services.AddHostedService<UserActivityMonitor>();
+
 
 
 
@@ -99,7 +102,8 @@ namespace AdamMIS
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtSettings?.Key!)),
                     ValidAudience = JwtSettings!.Audience,
-                    ValidIssuer = JwtSettings.Issuer
+                    ValidIssuer = JwtSettings.Issuer,
+                    ClockSkew = TimeSpan.Zero
 
 
                 };
