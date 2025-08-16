@@ -117,11 +117,12 @@ namespace AdamMIS.Controllers
                 return Unauthorized();
 
             var log = await _context.acivityLogs
-                .FirstOrDefaultAsync(l => l.UserId == userId && l.IsOnline);
+                .FirstOrDefaultAsync(l => l.UserId == userId /*&& l.IsOnline*/);
 
             if (log != null)
             {
                 log.LastActivityTime = DateTime.UtcNow;
+                log.SessionTime = log.LastActivityTime - log.LoginTime;
                 await _context.SaveChangesAsync();
             }
 

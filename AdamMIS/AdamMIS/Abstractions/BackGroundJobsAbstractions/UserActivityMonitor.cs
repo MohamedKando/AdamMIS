@@ -23,13 +23,19 @@
                 var expiredUsers = context.acivityLogs
                     .Where(l => l.IsOnline && l.LastActivityTime.AddMinutes(2) < now)
                     .ToList();
-
+                var activeUsers = context.acivityLogs
+                .Where(l => !l.IsOnline && l.LastActivityTime.AddMinutes(1) >= now)
+                .ToList();
                 foreach (var user in expiredUsers)
                 {
                     user.IsOnline = false;
                 }
+                foreach (var user in activeUsers)
+                {
+                    user.IsOnline = true;
+                }
 
-                if (expiredUsers.Any())
+                if (expiredUsers.Any() || activeUsers.Any())
                 {
                     await context.SaveChangesAsync(stoppingToken);
                 }

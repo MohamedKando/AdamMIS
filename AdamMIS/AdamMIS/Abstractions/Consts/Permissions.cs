@@ -47,7 +47,8 @@
 
         public const string ViewAdminManager = "View Admin Manager";
 
-        public const string AuditsLogs = "View Audits Logs";
+        public const string AuditsLogs = "View System Logs";
+        public const string ActivityLogs = "View Activity Logs";
 
 
 
