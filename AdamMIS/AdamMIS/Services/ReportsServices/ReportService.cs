@@ -25,20 +25,46 @@ namespace AdamMIS.Services.ReportsServices
             _context = context;
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
-            _reportsPath = Path.Combine(_webHostEnvironment.ContentRootPath, "Reports");
+            // Modified: Use network path instead of local path
+            _reportsPath = @"\\192.168.1.203\e$\crystal_reports";
             _loggingService = loggingservice;
             _httpContextAccessor = httpContextAccessor;
 
-            // Ensure Reports directory exists
-            if (!Directory.Exists(_reportsPath))
+            // Ensure Reports directory exists on network path
+            try
             {
-                Directory.CreateDirectory(_reportsPath);
+                if (!Directory.Exists(_reportsPath))
+                {
+                    Directory.CreateDirectory(_reportsPath);
+                    _logger.LogInformation($"Created reports directory at network path: {_reportsPath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to access or create network reports directory: {_reportsPath}");
+                throw new InvalidOperationException($"Cannot access network reports directory: {_reportsPath}", ex);
             }
         }
 
         private string GetCurrentUsername()
         {
             return _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Unknown";
+        }
+
+        /// <summary>
+        /// Validates network path accessibility
+        /// </summary>
+        private async Task<bool> ValidateNetworkPathAsync()
+        {
+            try
+            {
+                return await Task.Run(() => Directory.Exists(_reportsPath));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Network path validation failed: {_reportsPath}");
+                return false;
+            }
         }
 
         // Category Management
@@ -150,12 +176,21 @@ namespace AdamMIS.Services.ReportsServices
 
             var reportsCount = reports.Count;
 
-            // ✅ Delete report files from server
+            // Modified: Delete report files from network path
             foreach (var report in reports)
             {
-                if (File.Exists(report.FilePath))
+                try
                 {
-                    File.Delete(report.FilePath);
+                    if (File.Exists(report.FilePath))
+                    {
+                        await Task.Run(() => File.Delete(report.FilePath));
+                        _logger.LogInformation($"Deleted report file from network path: {report.FilePath}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Failed to delete report file from network path: {report.FilePath}");
+                    // Continue with database cleanup even if file deletion fails
                 }
             }
 
@@ -230,18 +265,38 @@ namespace AdamMIS.Services.ReportsServices
 
         public async Task<ReportResponse> UploadReportAsync(ReportRequest request, string createdBy)
         {
+            // Validate network path accessibility
+            if (!await ValidateNetworkPathAsync())
+            {
+                _logger.LogError($"Network path is not accessible: {_reportsPath}");
+                return null;
+            }
+
             var categoryExists = await _context.RCategories.AnyAsync(c => c.Id == request.CategoryId);
             if (!categoryExists)
                 return null;
+
             var fileExtension = Path.GetExtension(request.File.FileName);
             if (!fileExtension.Equals(".rpt", StringComparison.OrdinalIgnoreCase))
                 return null;
+
             var fileName = $"{Guid.NewGuid()}{fileExtension}";
             var filePath = Path.Combine(_reportsPath, fileName);
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            try
             {
-                await request.File.CopyToAsync(stream);
+                // Modified: Save to network path with async operation and error handling
+                using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
+                {
+                    await request.File.CopyToAsync(stream);
+                }
+
+                _logger.LogInformation($"Successfully saved report file to network path: {filePath}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to save report file to network path: {filePath}");
+                return null;
             }
 
             var report = new Reports
@@ -253,6 +308,7 @@ namespace AdamMIS.Services.ReportsServices
                 CreatedBy = createdBy,
                 IsActive = true
             };
+
             await _context.Reports.AddAsync(report);
             await _context.SaveChangesAsync();
 
@@ -268,7 +324,7 @@ namespace AdamMIS.Services.ReportsServices
                 ActionType = "Create",
                 EntityName = "Report",
                 EntityId = report.Id.ToString(),
-                Description = $"Uploaded new report '{report.FileName}' to category '{categoryName}'",
+                Description = $"Uploaded new report '{report.FileName}' to category '{categoryName}' on network path",
                 OldValues = null,
                 NewValues = JsonConvert.SerializeObject(new
                 {
@@ -276,7 +332,8 @@ namespace AdamMIS.Services.ReportsServices
                     CategoryName = categoryName,
                     FileSizeBytes = request.File.Length,
                     CreatedBy = createdBy,
-                    CreatedAt = report.CreatedAt
+                    CreatedAt = report.CreatedAt,
+                    NetworkPath = filePath
                 })
             });
 
@@ -311,10 +368,21 @@ namespace AdamMIS.Services.ReportsServices
                 FilePath = report.FilePath
             };
 
-            if (File.Exists(report.FilePath))
+            // Modified: Delete file from network path with error handling
+            try
             {
-                File.Delete(report.FilePath);
+                if (File.Exists(report.FilePath))
+                {
+                    await Task.Run(() => File.Delete(report.FilePath));
+                    _logger.LogInformation($"Successfully deleted report file from network path: {report.FilePath}");
+                }
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to delete report file from network path: {report.FilePath}");
+                // Continue with database deletion even if file deletion fails
+            }
+
             _context.Reports.Remove(report);
             await _context.SaveChangesAsync();
 
@@ -325,7 +393,7 @@ namespace AdamMIS.Services.ReportsServices
                 ActionType = "Delete",
                 EntityName = "Report",
                 EntityId = id.ToString(),
-                Description = $"Deleted report '{report.FileName}' from category '{report.Category?.Name}'",
+                Description = $"Deleted report '{report.FileName}' from category '{report.Category?.Name}' and network path",
                 OldValues = JsonConvert.SerializeObject(reportInfo),
                 NewValues = null
             });
@@ -333,8 +401,140 @@ namespace AdamMIS.Services.ReportsServices
             return true;
         }
 
-        // User Report Assignment
+        /// <summary>
+        /// New method: Load report file from network path
+        /// </summary>
+        public async Task<byte[]?> LoadReportFileAsync(int reportId)
+        {
+            var report = await _context.Reports
+                .Where(r => r.Id == reportId && r.IsActive)
+                .FirstOrDefaultAsync();
 
+            if (report == null)
+            {
+                _logger.LogWarning($"Report with ID {reportId} not found or inactive");
+                return null;
+            }
+
+            try
+            {
+                if (File.Exists(report.FilePath))
+                {
+                    var fileBytes = await File.ReadAllBytesAsync(report.FilePath);
+                    _logger.LogInformation($"Successfully loaded report file from network path: {report.FilePath}");
+
+                    // Log file access
+                    await _loggingService.LogAsync(new CreateLogRequest
+                    {
+                        Username = GetCurrentUsername(),
+                        ActionType = "Access",
+                        EntityName = "Report",
+                        EntityId = reportId.ToString(),
+                        Description = $"Loaded report file '{report.FileName}' from network path",
+                        OldValues = null,
+                        NewValues = JsonConvert.SerializeObject(new
+                        {
+                            FileName = report.FileName,
+                            FilePath = report.FilePath,
+                            AccessedAt = DateTime.UtcNow,
+                            FileSizeBytes = fileBytes.Length
+                        })
+                    });
+
+                    return fileBytes;
+                }
+                else
+                {
+                    _logger.LogError($"Report file not found at network path: {report.FilePath}");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to load report file from network path: {report.FilePath}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// New method: Get report file stream from network path
+        /// </summary>
+        public async Task<FileStream?> GetReportFileStreamAsync(int reportId)
+        {
+            var report = await _context.Reports
+                .Where(r => r.Id == reportId && r.IsActive)
+                .FirstOrDefaultAsync();
+
+            if (report == null)
+            {
+                _logger.LogWarning($"Report with ID {reportId} not found or inactive");
+                return null;
+            }
+
+            try
+            {
+                if (File.Exists(report.FilePath))
+                {
+                    var fileStream = new FileStream(report.FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    _logger.LogInformation($"Successfully opened report file stream from network path: {report.FilePath}");
+
+                    // Log file access
+                    await _loggingService.LogAsync(new CreateLogRequest
+                    {
+                        Username = GetCurrentUsername(),
+                        ActionType = "Stream Access",
+                        EntityName = "Report",
+                        EntityId = reportId.ToString(),
+                        Description = $"Opened file stream for report '{report.FileName}' from network path",
+                        OldValues = null,
+                        NewValues = JsonConvert.SerializeObject(new
+                        {
+                            FileName = report.FileName,
+                            FilePath = report.FilePath,
+                            AccessedAt = DateTime.UtcNow
+                        })
+                    });
+
+                    return fileStream;
+                }
+                else
+                {
+                    _logger.LogError($"Report file not found at network path: {report.FilePath}");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to open report file stream from network path: {report.FilePath}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// New method: Check if report file exists on network path
+        /// </summary>
+        public async Task<bool> ReportFileExistsAsync(int reportId)
+        {
+            var report = await _context.Reports
+                .Where(r => r.Id == reportId && r.IsActive)
+                .Select(r => r.FilePath)
+                .FirstOrDefaultAsync();
+
+            if (string.IsNullOrEmpty(report))
+                return false;
+
+            try
+            {
+                return await Task.Run(() => File.Exists(report));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error checking if report file exists: {report}");
+                return false;
+            }
+        }
+
+        // User Report Assignment (unchanged methods)
         public async Task<IEnumerable<UserReportResponse>> GetReportUsersAsync(int reportId)
         {
             var reportUsers = await _context.UserReports
@@ -566,7 +766,52 @@ namespace AdamMIS.Services.ReportsServices
 
         public async Task<Result> ClearAllReportsAsync(CancellationToken cancellationToken)
         {
-            // 1. Delete all users
+            // Modified: Also clean up files from network path before clearing database
+            try
+            {
+                var reports = await _context.Reports.ToListAsync(cancellationToken);
+
+                // Delete all physical files from network path
+                foreach (var report in reports)
+                {
+                    try
+                    {
+                        if (File.Exists(report.FilePath))
+                        {
+                            await Task.Run(() => File.Delete(report.FilePath), cancellationToken);
+                            _logger.LogInformation($"Deleted report file from network path: {report.FilePath}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Failed to delete report file: {report.FilePath}");
+                        // Continue with other files even if one fails
+                    }
+                }
+
+                // Log the cleanup operation
+                await _loggingService.LogAsync(new CreateLogRequest
+                {
+                    Username = GetCurrentUsername(),
+                    ActionType = "Bulk Delete",
+                    EntityName = "Report",
+                    EntityId = "ALL",
+                    Description = $"Cleared all {reports.Count} reports from database and network path",
+                    OldValues = JsonConvert.SerializeObject(new
+                    {
+                        TotalReportsDeleted = reports.Count,
+                        NetworkPath = _reportsPath,
+                        DeletedAt = DateTime.UtcNow
+                    }),
+                    NewValues = null
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while cleaning up report files from network path");
+            }
+
+            // 1. Delete all reports
             await _context.Database.ExecuteSqlRawAsync("DELETE FROM [Reports]", cancellationToken);
 
             // 2. Reset identity seed (to start from 1)
