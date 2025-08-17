@@ -11,7 +11,7 @@
         public bool IsActive { get; set; } = true;
 
         // Navigation properties
-        public ApplicationUser User { get; set; }
+        public ApplicationUser User { get; set; } 
         public ApplicationRole Role { get; set; }
        
     }

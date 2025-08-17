@@ -1,4 +1,5 @@
-﻿using AdamMIS.Entities.ReportsEnitites;
+﻿using AdamMIS.Entities.MetaBase;
+using AdamMIS.Entities.ReportsEnitites;
 using Microsoft.AspNetCore.Identity;
 
 namespace AdamMIS.Entities
@@ -15,6 +16,8 @@ namespace AdamMIS.Entities
 
         public string? InternalPhone { get; set; }
         public ICollection<UserReports> UserReports { get; set; } = new List<UserReports>();
+
+        public ICollection<UsersMetabases> UserMetabase { get; set; } = new List<UsersMetabases>();
         public ICollection<ApplicationUserRole> UserRoles { get; set; } = new List<ApplicationUserRole>();
     }
 }

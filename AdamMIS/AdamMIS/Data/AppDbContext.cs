@@ -1,6 +1,7 @@
 ﻿
 
 
+using AdamMIS.Entities.MetaBase;
 using AdamMIS.Entities.ReportsEnitites;
 using AdamMIS.Entities.SystemLogs;
 
@@ -21,6 +22,9 @@ namespace AdamMIS.Data
         public DbSet<SystemLog> SystemLog { get; set; }
 
         public DbSet<AcivityLogs> acivityLogs { get; set; }
+
+        public DbSet<Metabase> Metabases { get; set; }
+        public DbSet<UsersMetabases> UsersMetabases { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

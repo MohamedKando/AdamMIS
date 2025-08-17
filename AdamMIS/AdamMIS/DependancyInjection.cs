@@ -4,6 +4,8 @@ using AdamMIS.Authentications;
 using AdamMIS.Authentications.Filters;
 using AdamMIS.Services.AuthServices;
 using AdamMIS.Services.LogServices;
+using AdamMIS.Services.MetabaseServices;
+using AdamMIS.Services.MetabaseServices.AdamMIS.Services.Implementations;
 using AdamMIS.Services.ReportsServices;
 using AdamMIS.Services.RolesServices;
 using AdamMIS.Services.UsersServices;
@@ -32,6 +34,11 @@ namespace AdamMIS
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<ILoggingService, LoggingService>();
+            services.AddScoped<IMetabaseServices, MetabaseServices>();
+
+
+
+
 
             services.AddScoped<AuditSaveChangesInterceptor>();
             services.AddScoped<PermissionsSeeder>();
