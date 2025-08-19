@@ -468,11 +468,19 @@ namespace AdamMIS.Services.UsersServices
             if (user == null)
                 return Result.Failure<string>(UserErrors.UserNotFound);
 
-            var wwwRootPath = _env.WebRootPath;
-            var uploadsFolder = Path.Combine(wwwRootPath, "Uploads", "Users", "Images");
+            // Use the network path for storing photos
+            var uploadsFolder = @"\\192.168.1.203\e$\App-data\user-photos";
 
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
+            try
+            {
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+            }
+            catch (Exception ex)
+            {
+                // Handle network path access issues
+                return Result.Failure<string>(NetworkErrors.NetworkNotFound);
+            }
 
             var fileExtension = Path.GetExtension(request.Photo!.FileName);
             var fileName = $"{request.UserId}{fileExtension}";
@@ -484,23 +492,47 @@ namespace AdamMIS.Services.UsersServices
             // Delete old photo if it exists
             if (!string.IsNullOrEmpty(user.PhotoPath))
             {
-                var oldFilePath = Path.Combine(wwwRootPath, user.PhotoPath.TrimStart('/').Replace("/", Path.DirectorySeparatorChar.ToString()));
+                // For network path, construct the full path differently
+                var oldFileName = Path.GetFileName(user.PhotoPath);
+                var oldFilePath = Path.Combine(uploadsFolder, oldFileName);
+
                 if (System.IO.File.Exists(oldFilePath))
                 {
-                    System.IO.File.Delete(oldFilePath);
+                    try
+                    {
+                        System.IO.File.Delete(oldFilePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log the error but continue with upload
+                        await _loggingService.LogAsync(new CreateLogRequest
+                        {
+                            Username = GetCurrentUsername(),
+                            ActionType = "Warning",
+                            EntityName = "User Photo",
+                            EntityId = request.UserId,
+                            Description = $"Failed to delete old photo: {ex.Message}"
+                        });
+                    }
                 }
             }
 
             // Save the new photo
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            try
             {
-                await request.Photo.CopyToAsync(stream);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await request.Photo.CopyToAsync(stream);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure<string>(NetworkErrors.NetworkNotFound);
             }
 
-            // Update user's photo path in DB
-            var relativePath = $"/Uploads/Users/Images/{fileName}";
+            // Update user's photo path in DB - store just the filename since we know the network path
+            var relativePath = fileName; // Just store the filename
             user.PhotoPath = relativePath;
-
             await _context.SaveChangesAsync();
 
             // Manual logging for photo upload
@@ -510,7 +542,7 @@ namespace AdamMIS.Services.UsersServices
                 ActionType = "Update",
                 EntityName = "User Photo",
                 EntityId = request.UserId,
-                Description = $"Updated photo for user '{user.UserName}'",
+                Description = $"Updated photo for user '{user.UserName}' to network storage",
                 OldValues = JsonConvert.SerializeObject(new
                 {
                     UserName = user.UserName,
@@ -521,6 +553,7 @@ namespace AdamMIS.Services.UsersServices
                 {
                     UserName = user.UserName,
                     NewPhotoPath = relativePath,
+                    NetworkPath = filePath,
                     FileName = request.Photo.FileName,
                     FileSizeBytes = request.Photo.Length,
                     FileExtension = fileExtension,
@@ -530,7 +563,6 @@ namespace AdamMIS.Services.UsersServices
 
             return Result.Success(relativePath);
         }
-
         // Department methods (GET methods - no logging needed)
 
         public async Task<IEnumerable<DepartmentResponse>> GetAllDepartmentsAsync()

@@ -26,7 +26,7 @@ namespace AdamMIS.Services.ReportsServices
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
             // Modified: Use network path instead of local path
-            _reportsPath = @"\\192.168.1.203\e$\crystal_reports";
+            _reportsPath = @"\\192.168.1.203\e$\App-data\crystal_reports";
             _loggingService = loggingservice;
             _httpContextAccessor = httpContextAccessor;
 
