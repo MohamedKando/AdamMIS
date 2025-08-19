@@ -479,7 +479,7 @@ namespace AdamMIS.Services.UsersServices
             catch (Exception ex)
             {
                 // Handle network path access issues
-                return Result.Failure<string>(NetworkErrors.NetworkNotFound);
+                return Result.Failure<string>(UserErrors.UserNotFound);
             }
 
             var fileExtension = Path.GetExtension(request.Photo!.FileName);
@@ -530,8 +530,8 @@ namespace AdamMIS.Services.UsersServices
                 return Result.Failure<string>(NetworkErrors.NetworkNotFound);
             }
 
-            // Update user's photo path in DB - store just the filename since we know the network path
-            var relativePath = fileName; // Just store the filename
+            // Update user's photo path in DB - store the full network path
+            var relativePath = filePath; // Store the complete network path
             user.PhotoPath = relativePath;
             await _context.SaveChangesAsync();
 
