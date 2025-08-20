@@ -62,12 +62,11 @@ using (var scope = app.Services.CreateScope())
     var permissionSeeder = scope.ServiceProvider.GetRequiredService<PermissionsSeeder>();
     await permissionSeeder.SeedPermissionsAsync();
 }
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.WebRootPath, "Uploads")),
-    RequestPath = "/Uploads"
-});
+//app.UseStaticFiles(new StaticFileOptions
+//{
+//    FileProvider = new PhysicalFileProvider(@"\\192.168.1.203\e$\App-data"),
+//    RequestPath = ""  // Empty means serve from root
+//});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -77,6 +76,13 @@ if (app.Environment.IsDevelopment())
 }
 //app.UseSwagger();
 //app.UseSwaggerUI();
+app.UseStaticFiles(); // Default wwwroot (if you have one)
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(@"\\192.168.1.203\e$\App-data\user-photos"),
+    RequestPath = "/user-photos" // Map to /user-photos path
+});
 //app.UseDeveloperExceptionPage();
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
