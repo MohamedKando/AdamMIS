@@ -1,4 +1,5 @@
-﻿using Azure.Core.Serialization;
+﻿using AdamMIS.Entities.UserEntities;
+using Azure.Core.Serialization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

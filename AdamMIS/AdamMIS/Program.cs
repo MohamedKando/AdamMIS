@@ -64,8 +64,9 @@ using (var scope = app.Services.CreateScope())
 }
 //app.UseStaticFiles(new StaticFileOptions
 //{
-//    FileProvider = new PhysicalFileProvider(@"\\192.168.1.203\e$\App-data"),
-//    RequestPath = ""  // Empty means serve from root
+//    FileProvider = new PhysicalFileProvider(
+//        Path.Combine(builder.Environment.WebRootPath, "Uploads")),
+//    RequestPath = "/Uploads"
 //});
 
 // Configure the HTTP request pipeline.
@@ -76,13 +77,14 @@ if (app.Environment.IsDevelopment())
 }
 //app.UseSwagger();
 //app.UseSwaggerUI();
-app.UseStaticFiles(); // Default wwwroot (if you have one)
-
-app.UseStaticFiles(new StaticFileOptions
+app.UseStaticFileMappings(new Dictionary<string, string>
 {
-    FileProvider = new PhysicalFileProvider(@"\\192.168.1.203\e$\App-data\user-photos"),
-    RequestPath = "/user-photos" // Map to /user-photos path
+    { "/user-photos", @"\\192.168.1.203\e$\App-data\user-photos" },
+    { "/CrystalReportConfig",     @"\\192.168.1.203\e$\App-data\crystal_reports\CrystalReportConfig" },
+    { "/crystal_reports",     @"\\192.168.1.203\e$\App-data\crystal_reports" }
+
 });
+
 //app.UseDeveloperExceptionPage();
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();

@@ -1,4 +1,4 @@
-﻿namespace AdamMIS.Entities
+﻿namespace AdamMIS.Entities.UserEntities
 {
     public class ApplicationUserRole
     {

@@ -2,6 +2,7 @@
 using AdamMIS.Abstractions.LoggingAbstractions;
 using AdamMIS.Authentications;
 using AdamMIS.Authentications.Filters;
+using AdamMIS.Entities.UserEntities;
 using AdamMIS.Services.AuthServices;
 using AdamMIS.Services.LogServices;
 using AdamMIS.Services.MetabaseServices;

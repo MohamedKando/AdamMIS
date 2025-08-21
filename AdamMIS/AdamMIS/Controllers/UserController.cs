@@ -5,6 +5,7 @@ using AdamMIS.Contract.Authentications;
 using AdamMIS.Contract.Departments;
 using AdamMIS.Contract.UserRole;
 using AdamMIS.Contract.Users;
+using AdamMIS.Entities.UserEntities;
 using AdamMIS.Services.AuthServices;
 using AdamMIS.Services.UsersServices;
 using Microsoft.AspNetCore.Authorization;
@@ -105,10 +106,28 @@ namespace AdamMIS.Controllers
 
 
 
+        [HttpGet("user-permissions/{userId}")]
+       // [HasPermission(Permissions.ReadUsers)]
+        public async Task<IActionResult> GetUserPermissions(string userId)
+        {
+            var result = await _userService.GetUserPermissionsAsync(userId);
+            return result.IsSuccess ? Ok(result.Value) : Problem(result.Error.Description);
+        }
 
-
-
-
+        [HttpPut("update-permissions")]
+      //  [HasPermission(Permissions.UpdateUsers)]
+        public async Task<IActionResult> UpdateUserPermissions(UserPermissionRequest request)
+        {
+            var result = await _userService.UpdateUserPermissionsAsync(request);
+            return result.IsSuccess ? Ok() : Problem(result.Error.Description);
+        }
+        [HttpGet("Indevedual-permissions")]
+       // [HasPermission(Permissions.ReadUsers)]
+        public async Task<IActionResult> GetIndevedualPermissions()
+        {
+            var result = await _userService.GetIndevedualPermissionsAsync();
+            return result.IsSuccess ? Ok(result.Value) : Problem(result.Error.Description);
+        }
 
 
 

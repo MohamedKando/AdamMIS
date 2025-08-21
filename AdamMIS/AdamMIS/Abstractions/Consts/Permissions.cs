@@ -52,6 +52,15 @@
 
 
 
+        //indevdual permissions
+        public const string ViewMRM = "View MRM";
+        public const string ViewFDMS = "View F DMS";
+        public const string ViewHDMS = "View H DMS";
+        public const string ViewAIMS = "View AIMS";
+
+
+
+
 
         // Get All permission to display in frontend
         public static IList<string?> GetAllPermissions()
@@ -62,6 +71,20 @@
                 .Select(fi => fi.GetRawConstantValue() as string)
                 .Where(value => value != Permissions.DeleteLogs) 
                 .ToList();
+        }
+
+
+        public static IList<string?> GetIndividualPermissions()
+        {
+            var individualPermissions = new[]
+            {
+        ViewMRM,
+        ViewFDMS,
+        ViewHDMS,
+        ViewAIMS
+    };
+
+            return individualPermissions.ToList()!;
         }
     }
 }

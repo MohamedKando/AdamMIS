@@ -1,4 +1,5 @@
 ﻿using AdamMIS.Entities.ReportsEnitites;
+using AdamMIS.Entities.UserEntities;
 
 namespace AdamMIS.Entities.MetaBase
 {

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Query;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using AdamMIS.Entities.UserEntities;
 
 namespace AdamMIS.Services.UsersServices
 {
@@ -95,8 +96,27 @@ namespace AdamMIS.Services.UsersServices
                     Title = g.Key.Title,
                     DepartmentName = g.Key.DepartmentName,
                     Roles = g.Where(x => x.r != null).Select(x => x.r!.Name!)
+                    // Remove IndividualPermissions from here - we'll load them separately
                 }
             ).ToListAsync();
+
+            // Load individual permissions separately to avoid EF Core translation issues
+            var userIds = users.Select(u => u.Id).ToList();
+            var individualPermissions = await _context.UserPermissions
+                .Where(up => userIds.Contains(up.UserId))
+                .Select(up => new { up.UserId, up.Permission })
+                .ToListAsync();
+
+            // Group permissions by user ID
+            var permissionsByUser = individualPermissions
+                .GroupBy(p => p.UserId)
+                .ToDictionary(g => g.Key, g => g.Select(p => p.Permission).ToList());
+
+            // Assign individual permissions to each user
+            foreach (var user in users)
+            {
+                user.IndividualPermissions = permissionsByUser.GetValueOrDefault(user.Id, new List<string>());
+            }
 
             return users;
         }
@@ -282,6 +302,107 @@ namespace AdamMIS.Services.UsersServices
             });
 
             return Result.Success();
+        }
+
+        public async Task<Result<UserPermissionResponse>> GetUserPermissionsAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return Result.Failure<UserPermissionResponse>(UserErrors.UserNotFound);
+
+            // Get user roles
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            // Get permissions from roles - ONLY role-based permissions
+            var roleBasedPermissions = await _context.Roles
+                .Join(_context.RoleClaims, role => role.Id, claim => claim.RoleId, (role, claim) => new { role, claim })
+                .Where(x => userRoles.Contains(x.role.Name!))
+                .Select(x => x.claim.ClaimValue)
+                .Where(p => !string.IsNullOrEmpty(p))
+                .Distinct()
+                .ToListAsync();
+
+            // Get ONLY individual user permissions
+            var individualPermissions = await _context.UserPermissions
+                .Where(up => up.UserId == userId)
+                .Select(up => up.Permission)
+                .ToListAsync();
+
+            // Combine all permissions for the "AllPermissions" field
+            var allPermissions = roleBasedPermissions
+                .Union(individualPermissions)
+                .Distinct()
+                .ToList();
+
+            var response = new UserPermissionResponse
+            {
+                UserId = userId,
+                UserName = user.UserName!,
+                IndividualPermissions = individualPermissions, // Only individual permissions
+                RoleBasedPermissions = roleBasedPermissions!,  // Only role-based permissions  
+                AllPermissions = allPermissions!               // Combined permissions
+            };
+
+            return Result.Success(response);
+        }
+
+        public async Task<Result> UpdateUserPermissionsAsync(UserPermissionRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(request.UserId);
+            if (user == null)
+                return Result.Failure(UserErrors.UserNotFound);
+
+            // Get current individual permissions
+            var currentPermissions = await _context.UserPermissions
+                .Where(up => up.UserId == request.UserId)
+                .ToListAsync();
+
+            // Store old values for logging
+            var oldValues = new
+            {
+                UserId = request.UserId,
+                UserName = user.UserName,
+                IndividualPermissions = currentPermissions.Select(p => p.Permission).ToList()
+            };
+
+            // Remove all existing individual permissions
+            _context.UserPermissions.RemoveRange(currentPermissions);
+
+            // Add new individual permissions
+            var newPermissions = request.Permissions.Select(permission => new UserPermission
+            {
+                UserId = request.UserId,
+                Permission = permission,
+                CreatedAt = DateTime.UtcNow
+            }).ToList();
+
+            await _context.UserPermissions.AddRangeAsync(newPermissions);
+            await _context.SaveChangesAsync();
+
+            // Manual logging for user permissions update
+            await _loggingService.LogAsync(new CreateLogRequest
+            {
+                Username = GetCurrentUsername(),
+                ActionType = "Update",
+                EntityName = "User Individual Permissions",
+                EntityId = request.UserId,
+                Description = $"Updated individual permissions for user '{user.UserName}' - Total: {request.Permissions.Count}",
+                OldValues = JsonConvert.SerializeObject(oldValues),
+                NewValues = JsonConvert.SerializeObject(new
+                {
+                    UserId = request.UserId,
+                    UserName = user.UserName,
+                    IndividualPermissions = request.Permissions,
+                    UpdatedAt = DateTime.UtcNow
+                })
+            });
+
+            return Result.Success();
+        }
+        public async Task<Result<IEnumerable<string>>> GetIndevedualPermissionsAsync()
+        {
+            var allPermissions = Permissions.GetIndividualPermissions();
+            return Result.Success<IEnumerable<string>>(allPermissions!);
         }
 
         // User Profile (GET methods - no logging needed)

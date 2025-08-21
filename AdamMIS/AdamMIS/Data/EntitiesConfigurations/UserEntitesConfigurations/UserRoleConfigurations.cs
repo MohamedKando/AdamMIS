@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using AdamMIS.Entities.UserEntities;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AdamMIS.Data.EntitiesConfigurations.UserEntitesConfigurations
 {

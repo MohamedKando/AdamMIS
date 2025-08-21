@@ -1,4 +1,6 @@
-﻿namespace AdamMIS.Entities
+﻿using AdamMIS.Entities.UserEntities;
+
+namespace AdamMIS.Entities
 {
     public class Department
     {

@@ -2,7 +2,7 @@
 using AdamMIS.Entities.ReportsEnitites;
 using Microsoft.AspNetCore.Identity;
 
-namespace AdamMIS.Entities
+namespace AdamMIS.Entities.UserEntities
 {
     public class ApplicationUser : IdentityUser
     {

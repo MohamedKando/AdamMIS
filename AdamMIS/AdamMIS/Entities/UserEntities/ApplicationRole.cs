@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace AdamMIS.Entities
+namespace AdamMIS.Entities.UserEntities
 {
     public class ApplicationRole : IdentityRole
     {

@@ -4,6 +4,7 @@
 using AdamMIS.Entities.MetaBase;
 using AdamMIS.Entities.ReportsEnitites;
 using AdamMIS.Entities.SystemLogs;
+using AdamMIS.Entities.UserEntities;
 
 namespace AdamMIS.Data
 {
@@ -25,6 +26,7 @@ namespace AdamMIS.Data
 
         public DbSet<Metabase> Metabases { get; set; }
         public DbSet<UsersMetabases> UsersMetabases { get; set; }
+        public DbSet<UserPermission> UserPermissions { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

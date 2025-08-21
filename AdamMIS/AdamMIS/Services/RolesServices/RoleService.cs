@@ -1,6 +1,7 @@
 ﻿using AdamMIS.Abstractions.Consts;
 using AdamMIS.Contract.Roles;
 using AdamMIS.Contract.SystemLogs;
+using AdamMIS.Entities.UserEntities;
 using AdamMIS.Errors;
 using AdamMIS.Services.LogServices;
 using Microsoft.AspNetCore.Identity;

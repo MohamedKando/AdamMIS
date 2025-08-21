@@ -1,4 +1,6 @@
-﻿namespace AdamMIS.Authentications
+﻿using AdamMIS.Entities.UserEntities;
+
+namespace AdamMIS.Authentications
 {
     public interface IJwtProvider
     {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AdamMIS.Entities.UserEntities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AdamMIS.Data.EntitiesConfigurations.UserEntitesConfigurations

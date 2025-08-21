@@ -10,6 +10,7 @@
         public string? InternalPhone {  get; set; }
         public string? UserPhone { get; set; }
         public string? PhotoPath { get; set; }
+        public IEnumerable<string> IndividualPermissions { get; set; } = new List<string>();
         public IEnumerable<string> Roles { get; set; } = Enumerable.Empty<string>();
     }
 }
