@@ -2,9 +2,11 @@
 
 
 using AdamMIS.Entities.MetaBase;
+using AdamMIS.Entities.Messaging;
 using AdamMIS.Entities.ReportsEnitites;
 using AdamMIS.Entities.SystemLogs;
 using AdamMIS.Entities.UserEntities;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 
 namespace AdamMIS.Data
 {
@@ -28,6 +30,7 @@ namespace AdamMIS.Data
         public DbSet<UsersMetabases> UsersMetabases { get; set; }
         public DbSet<UserPermission> UserPermissions { get; set; }
 
+        public DbSet<Messagee> Messages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,6 +40,18 @@ namespace AdamMIS.Data
             foreach (var fk in cascadeFKs)
                 fk.DeleteBehavior = DeleteBehavior.Restrict;
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+
+            modelBuilder.Entity<Messagee>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasIndex(e => new { e.SenderId, e.RecipientId, e.SentAt })
+                      .HasDatabaseName("IX_Messages_Conversation");
+
+                entity.HasIndex(e => e.RecipientId)
+                      .HasDatabaseName("IX_Messages_Recipient");
+            });
         }
     }
 }

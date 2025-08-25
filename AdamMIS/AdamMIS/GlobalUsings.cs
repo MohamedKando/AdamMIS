@@ -17,6 +17,7 @@ global using AdamMIS.Abstractions.Consts;
 global using Error = AdamMIS.Abstractions.Error;
 global using AdamMIS.Abstractions;
 global using AdamMIS.Contract.Authentications;
+global using  AdamMIS.Contract.Tickets;
 
 
 

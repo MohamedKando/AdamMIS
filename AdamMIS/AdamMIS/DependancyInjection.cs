@@ -4,6 +4,7 @@ using AdamMIS.Authentications;
 using AdamMIS.Authentications.Filters;
 using AdamMIS.Entities.UserEntities;
 using AdamMIS.Services.AuthServices;
+using AdamMIS.Services.GLPIServices.TicketingServices;
 using AdamMIS.Services.LogServices;
 using AdamMIS.Services.MetabaseServices;
 using AdamMIS.Services.MetabaseServices.AdamMIS.Services.Implementations;
@@ -36,6 +37,7 @@ namespace AdamMIS
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<ILoggingService, LoggingService>();
             services.AddScoped<IMetabaseServices, MetabaseServices>();
+            services.AddScoped<ITicketingService, TicketingService>();
 
 
 

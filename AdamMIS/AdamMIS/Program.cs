@@ -4,7 +4,9 @@
 
 
 using AdamMIS.Abstractions.LoggingAbstractions;
+using AdamMIS.Abstractions.SignalR;
 using AdamMIS.Authentications.Filters;
+using AdamMIS.Services.GLPIServices.TicketingServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
@@ -33,12 +35,23 @@ builder.Services.AddDbContext<AppDbContext>((sp, options) =>
 builder.Services.AddDependency(builder.Configuration);
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", builder =>
+    // ? For normal API calls
+    options.AddPolicy("AllowAll", policy =>
     {
-        builder
+        policy
             .AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod();
+    });
+
+    // ? For SignalR
+    options.AddPolicy("SignalRCorsPolicy", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:4200") // Angular app
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); // required for SignalR
     });
 });
 // This builder use for generate logging file
@@ -47,7 +60,8 @@ builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration);
 }
 );
-
+builder.Services.AddSignalR();
+builder.Services.AddHttpClient<ITicketingService, TicketingService>();
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -88,10 +102,24 @@ app.UseStaticFileMappings(new Dictionary<string, string>
 //app.UseDeveloperExceptionPage();
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+app.UseRouting();
+
+app.UseCors();
+
+app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers()
+             .RequireCors("AllowAll");
+
+    endpoints.MapHub<ChatHub>("/chathub")
+             .RequireCors("SignalRCorsPolicy");
+});
 app.UseAuthorization();
 app.UseForwardedHeaders();
 //app.MapIdentityApi<ApplicationUser>();
 app.MapControllers();
 //app.UseExceptionHandler();
+
 app.Run();
