@@ -1,16 +1,5 @@
 
 
-
-
-
-using AdamMIS.Abstractions.LoggingAbstractions;
-using AdamMIS.Abstractions.SignalR;
-using AdamMIS.Authentications.Filters;
-using AdamMIS.Services.GLPIServices.TicketingServices;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.FileProviders;
-using Serilog;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -48,7 +37,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("SignalRCorsPolicy", policy =>
     {
         policy
-            .WithOrigins("http://localhost:4200") // Angular app
+            .WithOrigins("http://http://192.168.1.203") // Angular app
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials(); // required for SignalR

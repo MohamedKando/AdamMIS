@@ -1,10 +1,4 @@
-﻿using AdamMIS.Authentications.Filters;
-using AdamMIS.Contract.Reports;
-using AdamMIS.Contract.SystemLogs;
-using AdamMIS.Entities.ReportsEnitites;
-using AdamMIS.Errors;
-using AdamMIS.Services.LogServices;
-using FastReport.Barcode;
+﻿
 using Newtonsoft.Json;
 
 namespace AdamMIS.Services.ReportsServices

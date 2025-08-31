@@ -1,17 +1,5 @@
-﻿using AdamMIS.Contract.Departments;
-using AdamMIS.Contract.UserRole;
-using AdamMIS.Contract.Users;
-using AdamMIS.Contract.SystemLogs;
-using AdamMIS.Errors;
-using AdamMIS.Services.RolesServices;
-using AdamMIS.Services.LogServices;
-using Azure.Core;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Query;
+﻿
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using AdamMIS.Entities.UserEntities;
 
 namespace AdamMIS.Services.UsersServices
 {

@@ -1,9 +1,6 @@
-﻿using AdamMIS.Contract.Metabase;
-using AdamMIS.Contract.SystemLogs;
-using AdamMIS.Entities.MetaBase;
-using AdamMIS.Services.LogServices;
+﻿
 using Newtonsoft.Json;
-using System.Security.Claims;
+
 
 namespace AdamMIS.Services.MetabaseServices
 {

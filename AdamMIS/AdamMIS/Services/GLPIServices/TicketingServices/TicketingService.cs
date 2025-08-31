@@ -1,20 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
-using AdamMIS.Authentications;
-using AdamMIS.Abstractions;
-using AdamMIS.Authentications;
-using AdamMIS.Authentications.Filters;
-using AdamMIS.Contract.Authentications;
-using AdamMIS.Contract.Departments;
-using AdamMIS.Contract.UserRole;
-using AdamMIS.Contract.Users;
-using AdamMIS.Entities.UserEntities;
-using AdamMIS.Services.AuthServices;
-using AdamMIS.Services.UsersServices;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+
 namespace AdamMIS.Services.GLPIServices.TicketingServices
 {
 

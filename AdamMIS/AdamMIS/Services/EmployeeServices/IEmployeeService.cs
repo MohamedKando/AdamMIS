@@ -1,5 +1,4 @@
-﻿using AdamMIS.Contract.Employees;
-using AdamMIS.Entities.EmployeeEntities;
+﻿
 
 namespace AdamMIS.Services.EmployeeServices
 {

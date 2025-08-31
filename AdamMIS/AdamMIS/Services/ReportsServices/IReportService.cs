@@ -1,5 +1,4 @@
-﻿using AdamMIS.Contract.Reports;
-using AdamMIS.Contract.Users;
+﻿
 
 namespace AdamMIS.Services.ReportsServices
 {

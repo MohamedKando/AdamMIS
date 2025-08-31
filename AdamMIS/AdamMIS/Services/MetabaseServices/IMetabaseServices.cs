@@ -1,4 +1,4 @@
-﻿using AdamMIS.Contract.Metabase;
+﻿
 
 namespace AdamMIS.Services.MetabaseServices
 {

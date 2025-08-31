@@ -1,11 +1,4 @@
-﻿using AdamMIS.Authentications;
-using AdamMIS.Contract.Authentications;
-using AdamMIS.Entities.SystemLogs;
-using AdamMIS.Entities.UserEntities;
-using AdamMIS.Errors;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
+﻿
 
 namespace AdamMIS.Services.AuthServices
 {

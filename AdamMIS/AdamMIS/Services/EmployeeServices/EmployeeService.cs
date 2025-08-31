@@ -1,8 +1,4 @@
-﻿using AdamMIS.Contract.Employees;
-using AdamMIS.Entities.EmployeeEntities;
-using AdamMIS.Errors;
-using Azure.Core;
-using Microsoft.EntityFrameworkCore;
+﻿
 
 namespace AdamMIS.Services.EmployeeServices
 {

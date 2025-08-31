@@ -1,6 +1,4 @@
-﻿using AdamMIS.Contract.Common;
-using AdamMIS.Contract.SystemLogs;
-using AdamMIS.Entities.SystemLogs;
+﻿
 
 namespace AdamMIS.Services.LogServices
 {

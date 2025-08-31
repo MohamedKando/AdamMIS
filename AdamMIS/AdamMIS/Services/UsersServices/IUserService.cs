@@ -1,8 +1,4 @@
-﻿using AdamMIS.Contract.Departments;
-using AdamMIS.Contract.UserRole;
-using AdamMIS.Contract.Users;
-using AdamMIS.Entities.UserEntities;
-
+﻿
 namespace AdamMIS.Services.UsersServices
 {
     public interface IUserService

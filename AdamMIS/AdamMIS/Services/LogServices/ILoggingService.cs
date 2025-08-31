@@ -1,6 +1,4 @@
-﻿using AdamMIS.Contract.Common;
-using AdamMIS.Contract.SystemLogs;
-
+﻿
 namespace AdamMIS.Services.LogServices
 {
     public interface ILoggingService
