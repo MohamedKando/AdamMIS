@@ -12,11 +12,11 @@ namespace AdamMIS.Entities.UserEntities
         public string? Title { get; set; } // New field
         public int? DepartmentId { get; set; } // FK
         public string? PhotoPath { get; set; }
-        public Department? Department { get; set; } // Navigation property
+       
 
         public string? InternalPhone { get; set; }
         public ICollection<UserReports> UserReports { get; set; } = new List<UserReports>();
-
+        public Department? Department { get; set; } // Navigation property
         public ICollection<UsersMetabases> UserMetabase { get; set; } = new List<UsersMetabases>();
         public ICollection<ApplicationUserRole> UserRoles { get; set; } = new List<ApplicationUserRole>();
     }

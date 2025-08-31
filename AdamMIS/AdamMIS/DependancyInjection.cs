@@ -4,6 +4,7 @@ using AdamMIS.Authentications;
 using AdamMIS.Authentications.Filters;
 using AdamMIS.Entities.UserEntities;
 using AdamMIS.Services.AuthServices;
+using AdamMIS.Services.EmployeeServices;
 using AdamMIS.Services.GLPIServices.TicketingServices;
 using AdamMIS.Services.LogServices;
 using AdamMIS.Services.MetabaseServices;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace AdamMIS
 {
@@ -38,6 +40,7 @@ namespace AdamMIS
             services.AddScoped<ILoggingService, LoggingService>();
             services.AddScoped<IMetabaseServices, MetabaseServices>();
             services.AddScoped<ITicketingService, TicketingService>();
+            services.AddScoped<IEmployeeService, EmployeeService>();
 
 
 
@@ -52,6 +55,12 @@ namespace AdamMIS
 
             services.AddHttpContextAccessor();
             services.AddProblemDetails();
+
+            services.Configure<JsonOptions>(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                // Or use ReferenceHandler.Preserve if you need to maintain references
+            });
             return services;
         }
 

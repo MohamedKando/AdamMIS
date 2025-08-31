@@ -272,8 +272,7 @@ namespace AdamMIS.Controllers
                 .Where(u => u.Id != currentUserId &&
                            !u.IsDisabled &&
                            (u.UserName!.Contains(query) ||
-                            u.Email!.Contains(query) ||
-                            (u.Title != null && u.Title.Contains(query))))
+                            u.Email!.Contains(query) ))
                 .Select(u => new
                 {
                     u.Id,

@@ -7,6 +7,7 @@ using AdamMIS.Entities.ReportsEnitites;
 using AdamMIS.Entities.SystemLogs;
 using AdamMIS.Entities.UserEntities;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using AdamMIS.Entities.EmployeeEntities;
 
 namespace AdamMIS.Data
 {
@@ -31,6 +32,7 @@ namespace AdamMIS.Data
         public DbSet<UserPermission> UserPermissions { get; set; }
 
         public DbSet<Messagee> Messages { get; set; }
+        public DbSet<Employee> Employees { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

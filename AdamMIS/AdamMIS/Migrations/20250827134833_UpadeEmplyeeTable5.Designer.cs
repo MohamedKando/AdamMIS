@@ -4,6 +4,7 @@ using AdamMIS.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdamMIS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250827134833_UpadeEmplyeeTable5")]
+    partial class UpadeEmplyeeTable5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,7 +48,7 @@ namespace AdamMIS.Migrations
                         new
                         {
                             Id = 1,
-                            HeadId = "03174B27-D47B-4C12-94AD-676B3BF14BC2",
+                            HeadId = "b1855db6-6ac2-4750-a279-b4f52e2dc05f",
                             Name = "IT"
                         },
                         new
@@ -69,7 +72,7 @@ namespace AdamMIS.Migrations
                         new
                         {
                             Id = 5,
-                            HeadId = "9023369e-85f8-4389-85d0-d765caa0e1f9",
+                            HeadId = "080be5c4-43e2-4521-a80d-79936ed598df",
                             Name = "CEO"
                         });
                 });
@@ -116,9 +119,6 @@ namespace AdamMIS.Migrations
 
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int");
-
-                    b.Property<string>("DepartmentName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DoctorStatus")
                         .HasMaxLength(100)
@@ -668,7 +668,7 @@ namespace AdamMIS.Migrations
                             IsDisabled = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "MOHAMEDKANDIL",
-                            PasswordHash = "AQAAAAIAAYagAAAAELqy8DDy5S0BipoINGIZhGrOUT6V/uGAWVp/c9Yv+Kkck5GQVCu5GYOven5dC3/EJQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFNbXhWRotgZ0/uud4ilwB6Ux9F68RZpo/Yct2mjEvzO2kAbeIPT2cNfx1BBuoHRVQ==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "75B0F3ACD7DE4D088DA0594E3ACDC1EF",
                             TwoFactorEnabled = false,

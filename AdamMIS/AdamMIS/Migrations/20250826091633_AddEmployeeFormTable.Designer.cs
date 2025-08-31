@@ -4,6 +4,7 @@ using AdamMIS.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdamMIS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250826091633_AddEmployeeFormTable")]
+    partial class AddEmployeeFormTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,32 +48,24 @@ namespace AdamMIS.Migrations
                         new
                         {
                             Id = 1,
-                            HeadId = "03174B27-D47B-4C12-94AD-676B3BF14BC2",
+                            HeadId = "b1855db6-6ac2-4750-a279-b4f52e2dc05f",
                             Name = "IT"
                         },
                         new
                         {
                             Id = 2,
-                            HeadId = "9427f54e-4ca9-4662-b07b-ce078f19b4b9",
+                            HeadId = "b1855db6-6ac2-4750-a279-b4f52e2dc05f",
                             Name = "HR"
                         },
                         new
                         {
                             Id = 3,
-                            HeadId = "f2cb2e80-c4d8-432d-95b5-09ae5ab13069",
                             Name = "Finance"
                         },
                         new
                         {
                             Id = 4,
-                            HeadId = "e43c1183-1abd-4b65-bc5a-64fa7b06d66e",
                             Name = "Operations"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            HeadId = "9023369e-85f8-4389-85d0-d765caa0e1f9",
-                            Name = "CEO"
                         });
                 });
 
@@ -80,11 +75,14 @@ namespace AdamMIS.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("CEOCompletedAt")
+                    b.Property<bool>("CEOApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("CEOApprovedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CEOCompletedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("CEOApprovedById")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CEOSignature")
                         .HasColumnType("nvarchar(max)");
@@ -101,6 +99,10 @@ namespace AdamMIS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("CurrentStep")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -108,17 +110,17 @@ namespace AdamMIS.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasDefaultValue("HR");
 
-                    b.Property<DateTime?>("DepartmentCompletedAt")
+                    b.Property<bool>("DepartmentApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("DepartmentApprovedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DepartmentCompletedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("DepartmentApprovedById")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int");
-
-                    b.Property<string>("DepartmentName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DoctorStatus")
                         .HasMaxLength(100)
@@ -140,17 +142,23 @@ namespace AdamMIS.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<DateTime?>("HRCompletedAt")
+                    b.Property<bool>("HRApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("HRApprovedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("HRCompletedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("HRApprovedById")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime?>("ITCompletedAt")
+                    b.Property<bool>("ITApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ITApprovedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ITCompletedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("ITApprovedById")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool?>("InternalEmail")
                         .HasColumnType("bit");
@@ -220,12 +228,22 @@ namespace AdamMIS.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CEOApprovedById");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DepartmentApprovedById");
+
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("EmployeeNumber")
                         .IsUnique();
 
-                    b.ToTable("Employees");
+                    b.HasIndex("HRApprovedById");
+
+                    b.HasIndex("ITApprovedById");
+
+                    b.ToTable("Employee");
                 });
 
             modelBuilder.Entity("AdamMIS.Entities.Messaging.Messagee", b =>
@@ -668,7 +686,7 @@ namespace AdamMIS.Migrations
                             IsDisabled = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "MOHAMEDKANDIL",
-                            PasswordHash = "AQAAAAIAAYagAAAAELqy8DDy5S0BipoINGIZhGrOUT6V/uGAWVp/c9Yv+Kkck5GQVCu5GYOven5dC3/EJQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPFzRjS70f6WEkMHr5YR+dFrzr5JzaHW6v3sOD1vUx7pZWfKp+M2zHubJzjPAT8eew==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "75B0F3ACD7DE4D088DA0594E3ACDC1EF",
                             TwoFactorEnabled = false,
@@ -1046,13 +1064,37 @@ namespace AdamMIS.Migrations
 
             modelBuilder.Entity("AdamMIS.Entities.EmployeeEntities.Employee", b =>
                 {
-                    b.HasOne("AdamMIS.Entities.Department", "Department")
-                        .WithMany("Employees")
+                    b.HasOne("AdamMIS.Entities.UserEntities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("CEOApprovedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AdamMIS.Entities.UserEntities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AdamMIS.Entities.UserEntities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("DepartmentApprovedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AdamMIS.Entities.Department", null)
+                        .WithMany()
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Department");
+                    b.HasOne("AdamMIS.Entities.UserEntities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("HRApprovedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AdamMIS.Entities.UserEntities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("ITApprovedById")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("AdamMIS.Entities.MetaBase.UsersMetabases", b =>
@@ -1205,8 +1247,6 @@ namespace AdamMIS.Migrations
 
             modelBuilder.Entity("AdamMIS.Entities.Department", b =>
                 {
-                    b.Navigation("Employees");
-
                     b.Navigation("Users");
                 });
 

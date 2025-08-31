@@ -137,7 +137,7 @@ namespace AdamMIS.Controllers
 
 
         [HttpGet("{id}")]
-       [Authorize]
+       //[Authorize]
         public async Task<IActionResult> GetById(string id)
         {
             var result = await _userService.GetUserProfileByIdAsync(id);

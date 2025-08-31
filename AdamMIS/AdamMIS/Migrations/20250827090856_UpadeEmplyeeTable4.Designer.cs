@@ -4,6 +4,7 @@ using AdamMIS.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdamMIS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250827090856_UpadeEmplyeeTable4")]
+    partial class UpadeEmplyeeTable4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,32 +48,24 @@ namespace AdamMIS.Migrations
                         new
                         {
                             Id = 1,
-                            HeadId = "03174B27-D47B-4C12-94AD-676B3BF14BC2",
+                            HeadId = "b1855db6-6ac2-4750-a279-b4f52e2dc05f",
                             Name = "IT"
                         },
                         new
                         {
                             Id = 2,
-                            HeadId = "9427f54e-4ca9-4662-b07b-ce078f19b4b9",
+                            HeadId = "03174B27-D47B-4C12-94AD-676B3BF14BC2",
                             Name = "HR"
                         },
                         new
                         {
                             Id = 3,
-                            HeadId = "f2cb2e80-c4d8-432d-95b5-09ae5ab13069",
                             Name = "Finance"
                         },
                         new
                         {
                             Id = 4,
-                            HeadId = "e43c1183-1abd-4b65-bc5a-64fa7b06d66e",
                             Name = "Operations"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            HeadId = "9023369e-85f8-4389-85d0-d765caa0e1f9",
-                            Name = "CEO"
                         });
                 });
 
@@ -116,9 +111,6 @@ namespace AdamMIS.Migrations
 
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int");
-
-                    b.Property<string>("DepartmentName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DoctorStatus")
                         .HasMaxLength(100)
@@ -668,7 +660,7 @@ namespace AdamMIS.Migrations
                             IsDisabled = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "MOHAMEDKANDIL",
-                            PasswordHash = "AQAAAAIAAYagAAAAELqy8DDy5S0BipoINGIZhGrOUT6V/uGAWVp/c9Yv+Kkck5GQVCu5GYOven5dC3/EJQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOuYM6esEUb50N/H98tyTAbJiA7Up8/GSZ9p6aShwKe8hcUwWxF/UFj7Tg+2AxIn2A==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "75B0F3ACD7DE4D088DA0594E3ACDC1EF",
                             TwoFactorEnabled = false,
