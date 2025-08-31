@@ -37,7 +37,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("SignalRCorsPolicy", policy =>
     {
         policy
-            .WithOrigins("http://http://192.168.1.203") // Angular app
+            .WithOrigins("http://192.168.1.203", "http://192.168.1.203:8080", "http://192.168.1.203:8080") // Angular app
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials(); // required for SignalR
