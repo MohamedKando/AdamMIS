@@ -217,8 +217,8 @@ namespace AdamMIS.Controllers
             return Ok(result.Value);
         }
 
-        [HttpGet("department-users/assigen-head")]
-        public async Task<ActionResult> AssigenUserToDepartmentHead(DepartmentHeadRequest request)
+        [HttpPost("department-users/assigen-head")]
+        public async Task<ActionResult> AssigenUserToDepartmentHead([FromBody]  DepartmentHeadRequest request)
         {
             var result = await _userService.AssignUserAsDepartmentHeadAsync(request);
 
@@ -228,8 +228,8 @@ namespace AdamMIS.Controllers
             return NoContent();
         }
 
-        [HttpGet("department-users/remove-head")]
-        public async Task<ActionResult> RemoveUserFromDepartmentHead(DepartmentHeadRequest request)
+        [HttpDelete("department-users/remove-head")]
+        public async Task<ActionResult> RemoveUserFromDepartmentHead([FromBody] DepartmentHeadRequest request)
         {
             var result = await _userService.RemoveUserAsDepartmentHeadAsync(request);
 

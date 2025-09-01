@@ -24,23 +24,22 @@ builder.Services.AddDbContext<AppDbContext>((sp, options) =>
 builder.Services.AddDependency(builder.Configuration);
 builder.Services.AddCors(options =>
 {
-    // ? For normal API calls
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("ApiCorsPolicy", policy =>
     {
         policy
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-
-    // ? For SignalR
-    options.AddPolicy("SignalRCorsPolicy", policy =>
-    {
-        policy
-            .WithOrigins("http://192.168.1.203","http://192.168.1.203:8080", "http://adamhmis.adam.hospital", "http://localhost:4200/") // Angular app
+            .WithOrigins(
+                "http://192.168.1.203",
+                "https://192.168.1.203",
+                "http://192.168.1.203:8080",
+                "https://192.168.1.203:8080",
+                "http://localhost:4200",
+                "https://localhost:4200",
+                "http://adamhmis.adam.hospital",
+                "https://adamhmis.adam.hospital"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials(); // required for SignalR
+            .AllowCredentials();
     });
 });
 // This builder use for generate logging file
@@ -93,17 +92,14 @@ app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseRouting();
 
-app.UseCors("AllowAll");
+app.UseCors("ApiCorsPolicy");
 
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapControllers();
-           
-
     endpoints.MapHub<ChatHub>("/chathub")
-             .RequireCors("SignalRCorsPolicy");
+             .RequireCors("ApiCorsPolicy");
 });
 app.UseAuthorization();
 app.UseForwardedHeaders();
