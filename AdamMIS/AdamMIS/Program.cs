@@ -93,14 +93,14 @@ app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseRouting();
 
-app.UseCors();
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapControllers()
-             .RequireCors("AllowAll");
+    endpoints.MapControllers();
+           
 
     endpoints.MapHub<ChatHub>("/chathub")
              .RequireCors("SignalRCorsPolicy");
