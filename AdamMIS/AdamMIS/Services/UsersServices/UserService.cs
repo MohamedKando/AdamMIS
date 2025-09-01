@@ -1,4 +1,5 @@
 ﻿
+using AdamMIS.Entities.DepartmentEntities;
 using Newtonsoft.Json;
 
 namespace AdamMIS.Services.UsersServices
@@ -616,7 +617,126 @@ namespace AdamMIS.Services.UsersServices
         }
 
         // Department methods (GET methods - no logging needed)
+        public async Task<Result> AssignUserAsDepartmentHeadAsync(DepartmentHeadRequest request)
+        {
+            // Validate user exists
+            var user = await _userManager.FindByIdAsync(request.UserId);
+            if (user == null)
+                return Result.Failure(UserErrors.UserNotFound);
 
+            // Validate department exists
+            var department = await _context.Departments
+                .Include(d => d.Heads)
+                .FirstOrDefaultAsync(d => d.Id == request.DepartmentId);
+            if (department == null)
+                return Result.Failure(DepartmentErrors.DepartmentNotFound);
+
+            // Check if user is already a head of this department
+            var existingAssignment = await _context.DepartmentHeads
+                .FirstOrDefaultAsync(dh => dh.HeadId == request.UserId && dh.DepartmentId == request.DepartmentId);
+
+            if (existingAssignment != null)
+                return Result.Failure(new Error("UserAlreadyDepartmentHead", "User is already a head of this department", 400));
+
+            // Store old values for logging
+            var currentHeads = department.Heads.Select(h => h.HeadId).ToList();
+            var oldValues = new
+            {
+                DepartmentName = department.Name,
+                CurrentHeads = currentHeads,
+                HeadCount = currentHeads.Count
+            };
+
+            // Create new department head assignment
+            var departmentHead = new DepartmentHead
+            {
+                HeadId = request.UserId,
+                DepartmentId = request.DepartmentId
+            };
+
+            await _context.DepartmentHeads.AddAsync(departmentHead);
+            await _context.SaveChangesAsync();
+
+            // Manual logging for department head assignment
+            await _loggingService.LogAsync(new CreateLogRequest
+            {
+                Username = GetCurrentUsername(),
+                ActionType = "Assign",
+                EntityName = "Department Head",
+                EntityId = request.UserId,
+                Description = $"Assigned user '{user.UserName}' as head of '{department.Name}' department",
+                OldValues = JsonConvert.SerializeObject(oldValues),
+                NewValues = JsonConvert.SerializeObject(new
+                {
+                    DepartmentName = department.Name,
+                    AssignedUserId = request.UserId,
+                    AssignedUserName = user.UserName,
+                    NewHeadCount = currentHeads.Count + 1,
+                    AssignedAt = DateTime.UtcNow,
+                    AssignedBy = GetCurrentUsername()
+                })
+            });
+
+            return Result.Success();
+        }
+
+        public async Task<Result> RemoveUserAsDepartmentHeadAsync(DepartmentHeadRequest request)
+        {
+            // Validate user exists
+            var user = await _userManager.FindByIdAsync(request.UserId);
+            if (user == null)
+                return Result.Failure(UserErrors.UserNotFound);
+
+            // Validate department exists
+            var department = await _context.Departments
+                .Include(d => d.Heads)
+                .FirstOrDefaultAsync(d => d.Id == request.DepartmentId);
+            if (department == null)
+                return Result.Failure(DepartmentErrors.DepartmentNotFound);
+
+            // Find the department head assignment
+            var departmentHead = await _context.DepartmentHeads
+                .FirstOrDefaultAsync(dh => dh.HeadId == request.UserId && dh.DepartmentId == request.DepartmentId);
+
+            if (departmentHead == null)
+                return Result.Failure(new Error("UserNotDepartmentHead", "User is not a head of this department", 400));
+
+            // Store old values for logging
+            var currentHeads = department.Heads.Select(h => h.HeadId).ToList();
+            var oldValues = new
+            {
+                DepartmentName = department.Name,
+                RemovedUserId = request.UserId,
+                RemovedUserName = user.UserName,
+                CurrentHeadCount = currentHeads.Count
+            };
+
+            // Remove the department head assignment
+            _context.DepartmentHeads.Remove(departmentHead);
+            await _context.SaveChangesAsync();
+
+            // Manual logging for department head removal
+            await _loggingService.LogAsync(new CreateLogRequest
+            {
+                Username = GetCurrentUsername(),
+                ActionType = "Remove",
+                EntityName = "Department Head",
+                EntityId = request.UserId,
+                Description = $"Removed user '{user.UserName}' as head of '{department.Name}' department",
+                OldValues = JsonConvert.SerializeObject(oldValues),
+                NewValues = JsonConvert.SerializeObject(new
+                {
+                    DepartmentName = department.Name,
+                    RemovedUserId = request.UserId,
+                    RemovedUserName = user.UserName,
+                    NewHeadCount = currentHeads.Count - 1,
+                    RemovedAt = DateTime.UtcNow,
+                    RemovedBy = GetCurrentUsername()
+                })
+            });
+
+            return Result.Success();
+        }
         public async Task<IEnumerable<DepartmentResponse>> GetAllDepartmentsAsync()
         {
             var departments = await _context.Departments.ToListAsync();

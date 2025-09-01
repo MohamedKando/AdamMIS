@@ -1,4 +1,5 @@
-﻿using AdamMIS.Entities.MetaBase;
+﻿using AdamMIS.Entities.DepartmentEntities;
+using AdamMIS.Entities.MetaBase;
 using AdamMIS.Entities.ReportsEnitites;
 using Microsoft.AspNetCore.Identity;
 

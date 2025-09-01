@@ -8,6 +8,7 @@ using AdamMIS.Entities.SystemLogs;
 using AdamMIS.Entities.UserEntities;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using AdamMIS.Entities.EmployeeEntities;
+using AdamMIS.Entities.DepartmentEntities;
 
 namespace AdamMIS.Data
 {
@@ -22,6 +23,7 @@ namespace AdamMIS.Data
         public DbSet<Reports> Reports { get; set; }
         public DbSet<UserReports> UserReports { get; set; }
         public DbSet<Department> Departments { get; set; }
+        public DbSet<DepartmentHead> DepartmentHeads { get; set; }
         public DbSet<ApplicationUserRole> ApplicationUserRole { get; set; }
         public DbSet<SystemLog> SystemLog { get; set; }
 

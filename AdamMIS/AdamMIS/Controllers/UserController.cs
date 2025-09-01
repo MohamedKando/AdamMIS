@@ -217,6 +217,28 @@ namespace AdamMIS.Controllers
             return Ok(result.Value);
         }
 
+        [HttpGet("department-users/assigen-head")]
+        public async Task<ActionResult> AssigenUserToDepartmentHead(DepartmentHeadRequest request)
+        {
+            var result = await _userService.AssignUserAsDepartmentHeadAsync(request);
+
+            if (result.IsFailure)
+                return Problem(result.Error.Description, result.Error.Code, result.Error.StatusCode);
+
+            return NoContent();
+        }
+
+        [HttpGet("department-users/remove-head")]
+        public async Task<ActionResult> RemoveUserFromDepartmentHead(DepartmentHeadRequest request)
+        {
+            var result = await _userService.RemoveUserAsDepartmentHeadAsync(request);
+
+            if (result.IsFailure)
+                return Problem(result.Error.Description, result.Error.Code, result.Error.StatusCode);
+
+            return NoContent();
+        }
+
 
 
 

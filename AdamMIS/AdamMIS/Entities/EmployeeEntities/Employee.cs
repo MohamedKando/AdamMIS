@@ -1,4 +1,5 @@
-﻿using AdamMIS.Entities.UserEntities;
+﻿using AdamMIS.Entities.DepartmentEntities;
+using AdamMIS.Entities.UserEntities;
 
 namespace AdamMIS.Entities.EmployeeEntities
 {

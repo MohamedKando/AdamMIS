@@ -1,4 +1,4 @@
-﻿
+﻿using AdamMIS.Entities.DepartmentEntities;
 
 namespace AdamMIS.Services.EmployeeServices
 {
@@ -16,7 +16,7 @@ namespace AdamMIS.Services.EmployeeServices
         {
             if (!await IsUserHRHeadAsync(createdBy))
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.UserIsNotHr);
-            var isExist = await _context.Employees.AnyAsync(x=>x.EmployeeNumber == request.EmployeeNumber);
+            var isExist = await _context.Employees.AnyAsync(x => x.EmployeeNumber == request.EmployeeNumber);
             if (isExist)
             {
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.DublicatedEmployee);
@@ -46,7 +46,7 @@ namespace AdamMIS.Services.EmployeeServices
 
             await _context.Employees.AddAsync(employee);
             await _context.SaveChangesAsync();
-            var response= MapToResponse(employee);
+            var response = MapToResponse(employee);
             return Result.Success(response);
         }
 
@@ -59,13 +59,9 @@ namespace AdamMIS.Services.EmployeeServices
             if (employee == null)
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.EmployeeNotFound);
 
-           // if (employee.CurrentStep != "HR")
-             //   throw new InvalidOperationException("Employee is not at HR step");
-
             if (!await IsUserHRHeadAsync(userId))
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.UserIsNotHr);
 
-   
             // Mark HR step as completed
             employee.HRCompletedAt = DateTime.UtcNow;
             employee.HRCompletedBy = userId;
@@ -84,16 +80,14 @@ namespace AdamMIS.Services.EmployeeServices
         {
             var employee = await _context.Employees
                 .Include(e => e.Department)
+                    .ThenInclude(d => d.Heads)
                 .FirstOrDefaultAsync(e => e.Id == request.EmployeeId);
-
 
             if (employee == null)
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.EmployeeNotFound);
 
-            //if (employee.CurrentStep != "DepartmentHead")
-            //  throw new InvalidOperationException("Employee is not at Department Head step");
-
-            if (employee.Department.HeadId != userId)
+            // Check if user is a head of this employee's department
+            if (!employee.Department.Heads.Any(h => h.HeadId == userId))
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.UserIsNotDepartmentHead);
 
             // Update medical fields if medical employee
@@ -131,18 +125,15 @@ namespace AdamMIS.Services.EmployeeServices
         {
             var employee = await _context.Employees
                 .Include(e => e.Department)
+                    .ThenInclude(d => d.Heads)
                 .FirstOrDefaultAsync(e => e.Id == employeeId);
 
             if (employee == null)
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.EmployeeNotFound);
 
-            //if (employee.CurrentStep != "DepartmentHead")
-              //  throw new InvalidOperationException("Employee is not at Department Head step");
-
-            if (employee.Department.HeadId != userId)
+            // Check if user is a head of this employee's department
+            if (!employee.Department.Heads.Any(h => h.HeadId == userId))
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.UserIsNotDepartmentHead);
-
-
 
             employee.DepartmentCompletedAt = DateTime.UtcNow;
             employee.DepartmentCompletedBy = userId;
@@ -161,9 +152,6 @@ namespace AdamMIS.Services.EmployeeServices
             if (employee == null)
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.EmployeeNotFound);
 
-            //if (employee.CurrentStep != "IT")
-            //    throw new InvalidOperationException("Employee is not at IT step");
-
             if (!await IsUserITHeadAsync(userId))
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.UserIsNotITtHead);
 
@@ -176,7 +164,7 @@ namespace AdamMIS.Services.EmployeeServices
             employee.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
-            var response= MapToResponse(employee);
+            var response = MapToResponse(employee);
             return Result<EmployeeResponse>.Success(response);
         }
 
@@ -186,13 +174,8 @@ namespace AdamMIS.Services.EmployeeServices
             if (employee == null)
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.EmployeeNotFound);
 
-            //if (employee.CurrentStep != "IT")
-            //    throw new InvalidOperationException("Employee is not at IT step");
-
             if (!await IsUserITHeadAsync(userId))
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.UserIsNotITtHead);
-
-
 
             employee.ITCompletedAt = DateTime.UtcNow;
             employee.ITCompletedBy = userId;
@@ -200,8 +183,8 @@ namespace AdamMIS.Services.EmployeeServices
             employee.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
-            var response= MapToResponse(employee);
-            return Result<Result<EmployeeResponse>>.Success(response);
+            var response = MapToResponse(employee);
+            return Result.Success(response); // Fixed: removed double Result wrapping
         }
 
         // ============= CEO STEP =============
@@ -211,9 +194,6 @@ namespace AdamMIS.Services.EmployeeServices
             if (employee == null)
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.EmployeeNotFound);
 
-            //if (employee.CurrentStep != "CEO")
-            //    throw new InvalidOperationException("Employee is not at CEO step");
-
             if (!await IsUserCEOAsync(userId))
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.UserIsNotCEO);
 
@@ -221,7 +201,7 @@ namespace AdamMIS.Services.EmployeeServices
             employee.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
-            var response= MapToResponse(employee);
+            var response = MapToResponse(employee);
             return Result.Success(response);
         }
 
@@ -230,9 +210,6 @@ namespace AdamMIS.Services.EmployeeServices
             var employee = await _context.Employees.FindAsync(employeeId);
             if (employee == null)
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.EmployeeNotFound);
-
-            //if (employee.CurrentStep != "CEO")
-            //    throw new InvalidOperationException("Employee is not at CEO step");
 
             if (!await IsUserCEOAsync(userId))
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.UserIsNotCEO);
@@ -244,16 +221,10 @@ namespace AdamMIS.Services.EmployeeServices
             employee.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
-            var response= MapToResponse(employee);
+            var response = MapToResponse(employee);
             return Result.Success(response);
         }
 
-        // ============= VALIDATION METHODS =============
-
-
-
-
-    
         // ============= QUERY METHODS =============
         public async Task<EmployeeResponse> GetEmployeeByIdAsync(Guid id)
         {
@@ -283,6 +254,7 @@ namespace AdamMIS.Services.EmployeeServices
 
             IQueryable<Employee> query = _context.Employees
                 .Include(e => e.Department)
+                    .ThenInclude(d => d.Heads)
                 .Where(e => e.Status == "InProgress" || e.Status == "Draft");
 
             query = userRole switch
@@ -290,7 +262,8 @@ namespace AdamMIS.Services.EmployeeServices
                 "HR" => query.Where(e => e.CurrentStep == "HR"),
                 "IT" => query.Where(e => e.CurrentStep == "IT"),
                 "CEO" => query.Where(e => e.CurrentStep == "CEO"),
-                _ => query.Where(e => e.CurrentStep == "DepartmentHead" && e.Department.HeadId == userId)
+                _ => query.Where(e => e.CurrentStep == "DepartmentHead" &&
+                                    e.Department.Heads.Any(h => h.HeadId == userId))
             };
 
             var employees = await query.OrderByDescending(e => e.CreatedAt).ToListAsync();
@@ -300,55 +273,70 @@ namespace AdamMIS.Services.EmployeeServices
         // ============= ACCESS CONTROL HELPERS =============
         private async Task<bool> IsUserHRHeadAsync(string userId)
         {
-            return await _context.Departments.AnyAsync(d => d.Name == "HR" && d.HeadId == userId);
+            return await _context.DepartmentHeads
+                .Include(dh => dh.Department)
+                .AnyAsync(dh => dh.Department.Name == "HR" && dh.HeadId == userId);
         }
 
         private async Task<bool> IsUserITHeadAsync(string userId)
         {
-            return await _context.Departments.AnyAsync(d => d.Name == "IT" && d.HeadId == userId);
+            return await _context.DepartmentHeads
+                .Include(dh => dh.Department)
+                .AnyAsync(dh => dh.Department.Name == "IT" && dh.HeadId == userId);
         }
 
         private async Task<bool> IsUserCEOAsync(string userId)
         {
-            return await _context.Departments.AnyAsync(d => d.Name == "CEO" && d.HeadId == userId);
+            return await _context.DepartmentHeads
+                .Include(dh => dh.Department)
+                .AnyAsync(dh => dh.Department.Name == "CEO" && dh.HeadId == userId);
         }
 
         private async Task<bool> IsUserDepartmentHeadAsync(string userId)
         {
-            return await _context.Departments.AnyAsync(d => d.HeadId == userId);
+            return await _context.DepartmentHeads.AnyAsync(dh => dh.HeadId == userId);
         }
 
-        private async Task<Department> GetUserDepartmentAsync(string userId)
+        private async Task<List<Department>> GetUserDepartmentsAsync(string userId)
         {
-            return await _context.Departments.FirstOrDefaultAsync(d => d.HeadId == userId);
+            return await _context.DepartmentHeads
+                .Include(dh => dh.Department)
+                .Where(dh => dh.HeadId == userId)
+                .Select(dh => dh.Department)
+                .ToListAsync();
         }
-
 
         public async Task<EmployeeRoleRequest> GetUserRoleInfoAsync(string userId)
         {
-            var userDepartment = await GetUserDepartmentAsync(userId);
+            var userDepartments = await GetUserDepartmentsAsync(userId);
             var roleInfo = new EmployeeRoleRequest();
 
-            if (userDepartment != null)
+            if (userDepartments.Any())
             {
-                roleInfo.DepartmentId = userDepartment.Id;
-                roleInfo.DepartmentName = userDepartment.Name;
+                // For simplicity, use the first department for display
+                // You might want to modify this logic based on your business needs
+                var primaryDepartment = userDepartments.First();
+                roleInfo.DepartmentId = primaryDepartment.Id;
+                roleInfo.DepartmentName = primaryDepartment.Name;
 
                 // All department heads have DepartmentHead role
                 roleInfo.Roles.Add("DepartmentHead");
 
-                // Add specialized roles based on department
-                switch (userDepartment.Name.ToUpper())
+                // Add specialized roles based on departments
+                foreach (var department in userDepartments)
                 {
-                    case "HR":
-                        roleInfo.Roles.Add("HR");
-                        break;
-                    case "IT":
-                        roleInfo.Roles.Add("IT");
-                        break;
-                    case "CEO":
-                        roleInfo.Roles.Add("CEO");
-                        break;
+                    switch (department.Name.ToUpper())
+                    {
+                        case "HR":
+                            roleInfo.Roles.Add("HR");
+                            break;
+                        case "IT":
+                            roleInfo.Roles.Add("IT");
+                            break;
+                        case "CEO":
+                            roleInfo.Roles.Add("CEO");
+                            break;
+                    }
                 }
             }
             else
@@ -387,6 +375,7 @@ namespace AdamMIS.Services.EmployeeServices
                 _ => false
             };
         }
+
         public async Task<List<Employee>> GetEmployeesByStepForUserAsync(string stepName, string userId)
         {
             var roleInfo = await GetUserRoleInfoAsync(userId);
@@ -397,35 +386,42 @@ namespace AdamMIS.Services.EmployeeServices
                 return new List<Employee>();
             }
 
-            var query = _context.Employees.Where(e => e.CurrentStep == stepName);
+            var query = _context.Employees
+                .Include(e => e.Department)
+                    .ThenInclude(d => d.Heads)
+                .Where(e => e.CurrentStep == stepName);
 
             // ONLY filter by department for the DepartmentHead step
-            // All other steps (HR, IT, CEO) show ALL employees
-            if (stepName.ToUpper() == "DEPARTMENTHEAD" && roleInfo.DepartmentId.HasValue)
+            if (stepName.ToUpper() == "DEPARTMENTHEAD")
             {
                 // HR, IT, and CEO heads can see ALL employees in DepartmentHead step
-                // Regular department heads (Finance, Operations, etc.) only see their department's employees
+                // Regular department heads only see their department's employees
                 if (!roleInfo.Roles.Contains("HR") &&
                     !roleInfo.Roles.Contains("IT") &&
                     !roleInfo.Roles.Contains("CEO"))
                 {
-                    query = query.Where(e => e.DepartmentId == roleInfo.DepartmentId.Value);
+                    // Get all departments this user is head of
+                    var userDepartmentIds = await _context.DepartmentHeads
+                        .Where(dh => dh.HeadId == userId)
+                        .Select(dh => dh.DepartmentId)
+                        .ToListAsync();
+
+                    query = query.Where(e => userDepartmentIds.Contains(e.DepartmentId));
                 }
             }
 
             // For all other steps (HR, IT, CEO), return ALL employees without department filtering
-            return await (from e in query
-                          select new Employee
-                          {
-                              Id = e.Id,
-                              EmployeeNumber = e.EmployeeNumber,
-                              NameArabic = e.NameArabic,
-                              NameEnglish = e.NameEnglish,
-                              DepartmentId = e.DepartmentId,
-                              DepartmentName = e.Department != null ? e.Department.Name : null,
-                              Status = e.Status,
-                              CreatedAt = e.CreatedAt
-                          }).ToListAsync();
+            return await query.Select(e => new Employee
+            {
+                Id = e.Id,
+                EmployeeNumber = e.EmployeeNumber,
+                NameArabic = e.NameArabic,
+                NameEnglish = e.NameEnglish,
+                DepartmentId = e.DepartmentId,
+                DepartmentName = e.Department != null ? e.Department.Name : null,
+                Status = e.Status,
+                CreatedAt = e.CreatedAt
+            }).ToListAsync();
         }
 
         // ============= MAPPING =============
@@ -531,6 +527,7 @@ namespace AdamMIS.Services.EmployeeServices
         {
             var employee = await _context.Employees
                 .Include(e => e.Department)
+                    .ThenInclude(d => d.Heads)
                 .FirstOrDefaultAsync(e => e.Id == employeeId);
 
             if (employee == null) return "None";
@@ -538,8 +535,8 @@ namespace AdamMIS.Services.EmployeeServices
             // Check if user is HR head
             if (await IsUserHRHeadAsync(userId)) return "HR";
 
-            // Check if user is the department head for this employee
-            if (employee.Department.HeadId == userId) return "DepartmentHead";
+            // Check if user is a head for this employee's department
+            if (employee.Department.Heads.Any(h => h.HeadId == userId)) return "DepartmentHead";
 
             // Check if user is IT head
             if (await IsUserITHeadAsync(userId)) return "IT";
@@ -554,6 +551,7 @@ namespace AdamMIS.Services.EmployeeServices
         {
             var employee = await _context.Employees
                 .Include(e => e.Department)
+                    .ThenInclude(d => d.Heads)
                 .FirstOrDefaultAsync(e => e.Id == employeeId);
 
             if (employee == null) return false;
@@ -564,7 +562,7 @@ namespace AdamMIS.Services.EmployeeServices
             return step switch
             {
                 "HR" => await IsUserHRHeadAsync(userId),
-                "DepartmentHead" => employee.Department.HeadId == userId,
+                "DepartmentHead" => employee.Department.Heads.Any(h => h.HeadId == userId),
                 "IT" => await IsUserITHeadAsync(userId),
                 "CEO" => await IsUserCEOAsync(userId),
                 _ => false
@@ -575,6 +573,7 @@ namespace AdamMIS.Services.EmployeeServices
         {
             var employee = await _context.Employees
                 .Include(e => e.Department)
+                    .ThenInclude(d => d.Heads)
                 .FirstOrDefaultAsync(e => e.Id == employeeId);
 
             if (employee == null) return false;
@@ -582,7 +581,7 @@ namespace AdamMIS.Services.EmployeeServices
             return step switch
             {
                 "HR" => await IsUserHRHeadAsync(userId),
-                "DepartmentHead" => employee.Department.HeadId == userId,
+                "DepartmentHead" => employee.Department.Heads.Any(h => h.HeadId == userId),
                 "IT" => await IsUserITHeadAsync(userId),
                 "CEO" => await IsUserCEOAsync(userId),
                 _ => false
@@ -622,6 +621,5 @@ namespace AdamMIS.Services.EmployeeServices
 
             return stats;
         }
-
     }
 }

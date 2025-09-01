@@ -26,5 +26,7 @@ namespace AdamMIS.Services.UsersServices
         //departments
         Task<IEnumerable<DepartmentResponse>> GetAllDepartmentsAsync();
         Task<Result<IEnumerable<UserResponse>>> GetAllDepartmentUsersAsync(int deparmentId);
+        Task<Result> RemoveUserAsDepartmentHeadAsync(DepartmentHeadRequest request);
+        Task<Result> AssignUserAsDepartmentHeadAsync(DepartmentHeadRequest request);
     }
 }
