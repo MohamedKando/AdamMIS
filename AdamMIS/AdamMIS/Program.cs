@@ -1,4 +1,4 @@
-
+﻿
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,8 +30,6 @@ builder.Services.AddCors(options =>
             .WithOrigins(
                 "http://192.168.1.203",
                 "https://192.168.1.203",
-                "http://192.168.1.203:8080",
-                "https://192.168.1.203:8080",
                 "http://localhost:4200",
                 "https://localhost:4200",
                 "http://adamhmis.adam.hospital",
@@ -82,7 +80,7 @@ if (app.Environment.IsDevelopment())
 app.UseStaticFileMappings(new Dictionary<string, string>
 {
     { "/user-photos", @"\\192.168.1.203\e$\App-data\user-photos" },
-    { "/CrystalReportConfig",     @"\\192.168.1.203\e$\App-data\crystal_reports\CrystalReportConfig" },
+    { "/CrystalReportConfig",     @"\\192.168.1.203\e$\Programs\CrystalReportConfig" },
     { "/crystal_reports",     @"\\192.168.1.203\e$\App-data\crystal_reports" }
 
 });
@@ -92,19 +90,22 @@ app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseRouting();
 
-app.UseCors("ApiCorsPolicy");
+app.UseCors("ApiCorsPolicy"); // ✅ must come right after UseRouting
 
+app.UseAuthentication();      // ✅ if you use auth
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<ChatHub>("/chathub")
              .RequireCors("ApiCorsPolicy");
+
+    endpoints.MapControllers(); // 👈 controllers mapped here
 });
-app.UseAuthorization();
+
 app.UseForwardedHeaders();
 //app.MapIdentityApi<ApplicationUser>();
-app.MapControllers();
 //app.UseExceptionHandler();
 
 app.Run();
+
