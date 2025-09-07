@@ -402,7 +402,7 @@ namespace AdamMIS.Controllers
                 // Step 5: Open the file
                 Process.Start(new ProcessStartInfo
                 {
-                    FileName = "\\\\192.168.1.203\\c$\\Program Files\\Microsoft Visual Studio\\2022\\Communsity\\Common7\\IDE\\devenv.exe",
+                    FileName = "\\\\192.168.1.203\\c$\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\devenv.exe",
                     Arguments = $"\"{originalFilePath}\"",
                     UseShellExecute = true
                 });
