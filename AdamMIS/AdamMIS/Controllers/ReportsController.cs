@@ -339,7 +339,7 @@ namespace AdamMIS.Controllers
                     return NotFound(new { message = "Report file not found." });
 
                 // Execute ReportGenerator
-                var exePath = Path.Combine("\\\\192.168.1.203\\e$\\Programs\\CrystalReportConfig", "ReportGenerator.exe");
+                var exePath = Path.Combine("C:\\Program Files (x86)\\HospitalSystem", "ReportGenerator.exe");
 
                 var psi = new ProcessStartInfo
                 {
