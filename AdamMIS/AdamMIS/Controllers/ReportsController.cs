@@ -385,7 +385,7 @@ namespace AdamMIS.Controllers
                 }
 
                 // Step 7: Validate ReportGenerator.exe exists
-                var exePath = Path.Combine(Directory.GetCurrentDirectory(), "ReportGenerator.exe");
+                var exePath = Path.Combine("\\\\192.168.1.203\\e$\\App-data\\crystal_reports\\CrystalReportConfig", "ReportGenerator.exe");
                 if (!System.IO.File.Exists(exePath))
                 {
                     // Clean up temp file
