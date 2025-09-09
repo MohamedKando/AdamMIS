@@ -52,7 +52,7 @@ namespace AdamMIS.Services.AuthServices
                 Id = user.Id,
                 UserName = user.UserName!,
                 Token = token,
-                ExpiresIn = expireIn * 600
+                ExpiresIn = expireIn
             };
 
             var existingLog = await _context.acivityLogs
@@ -64,8 +64,8 @@ namespace AdamMIS.Services.AuthServices
                 {
                     UserId = user.Id,
                     UserName = name,
-                    LoginTime = DateTime.UtcNow,
-                    LastActivityTime = DateTime.UtcNow,
+                    LoginTime = DateTime.Now,
+                    LastActivityTime = DateTime.Now,
                     IsOnline = true,
                     IpAddress = ip
                 };
@@ -73,9 +73,9 @@ namespace AdamMIS.Services.AuthServices
             }
             else
             {
-                existingLog.LastActivityTime = DateTime.UtcNow;
+                existingLog.LastActivityTime = DateTime.Now;
                 existingLog.IsOnline = true;
-                existingLog.LoginTime = DateTime.UtcNow;
+                existingLog.LoginTime = DateTime.Now;
                 existingLog.SessionTime = existingLog.LoginTime - existingLog.LastActivityTime;
                 existingLog.IpAddress = ip;
             }

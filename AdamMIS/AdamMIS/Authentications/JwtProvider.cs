@@ -34,7 +34,7 @@ namespace AdamMIS.Authentications
 
             var expiresIn = _jwtOptions.ExpiryMinutes;
 
-            var expirationDate = DateTime.UtcNow.AddMinutes(expiresIn);
+            var expirationDate = DateTime.Now.AddMinutes(expiresIn);
 
             var token = new JwtSecurityToken(
                 issuer: _jwtOptions.Issuer,

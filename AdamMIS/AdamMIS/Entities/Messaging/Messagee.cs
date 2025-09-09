@@ -16,7 +16,7 @@ namespace AdamMIS.Entities.Messaging
         [MaxLength(1000)]
         public string Content { get; set; }
 
-        public DateTime SentAt { get; set; } = DateTime.UtcNow;
+        public DateTime SentAt { get; set; } = DateTime.Now;
 
         public bool IsRead { get; set; } = false;
 

@@ -10,7 +10,7 @@ namespace AdamMIS.Services.MetabaseServices
         Task<MetabaseResponse?> UpdateUrlAsync(int id,MetabaseRequest request);
         Task<bool> DeleteUrlAsync(int id);
 
-        Task<IEnumerable<UserMetabaseResponse>> AssignUrlsToUsersAsync(UserMetabaseRequest request, string assignedBy);
+        Task<AssignmentResult> AssignUrlsToUsersAsync(UserMetabaseRequest request, string assignedBy);
         Task<bool> UnassignUrlsFromUsersAsync(int userMetabaseId);
 
 

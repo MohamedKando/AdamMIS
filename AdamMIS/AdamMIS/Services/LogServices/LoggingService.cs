@@ -28,7 +28,7 @@ namespace AdamMIS.Services.LogServices
                 Description = dto.Description,
                 OldValues = dto.OldValues,
                 NewValues = dto.NewValues,
-                Timestamp = DateTime.UtcNow,
+                Timestamp = DateTime.Now,
                 IpAddress = ip
             };
 

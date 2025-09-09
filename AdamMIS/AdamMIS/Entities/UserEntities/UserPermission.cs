@@ -16,7 +16,7 @@ namespace AdamMIS.Entities
         [MaxLength(100)]
         public string Permission { get; set; } = default!;
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         // Navigation property
         public virtual ApplicationUser User { get; set; } = default!;

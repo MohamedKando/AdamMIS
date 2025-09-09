@@ -80,7 +80,7 @@ namespace AdamMIS.Controllers
 
                 if (log != null)
                 {
-                    log.LastActivityTime = DateTime.UtcNow;
+                    log.LastActivityTime = DateTime.Now;
                     log.IsOnline = false;
                     log.SessionTime = log.LastActivityTime-log.LoginTime;
                     await _context.SaveChangesAsync();
@@ -121,7 +121,7 @@ namespace AdamMIS.Controllers
 
             if (log != null)
             {
-                log.LastActivityTime = DateTime.UtcNow;
+                log.LastActivityTime = DateTime.Now;
                 log.SessionTime = log.LastActivityTime - log.LoginTime;
                 await _context.SaveChangesAsync();
             }

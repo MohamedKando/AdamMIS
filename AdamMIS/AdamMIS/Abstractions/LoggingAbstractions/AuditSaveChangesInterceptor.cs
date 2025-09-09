@@ -72,7 +72,7 @@ namespace AdamMIS.Abstractions.LoggingAbstractions
                     ActionType = actionType,
                     EntityName = GetFriendlyEntityName(entry.Entity.GetType().Name),
                     EntityId = GetPrimaryKeyValue(entry),
-                    Timestamp = DateTime.UtcNow,
+                    Timestamp = DateTime.Now,
                     IpAddress = ipAddress,
                     Description = GenerateSmartDescription(entry, actionType),
                     OldValues = GetSmartOldValues(entry),

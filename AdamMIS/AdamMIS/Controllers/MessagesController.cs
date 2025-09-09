@@ -111,7 +111,7 @@ namespace AdamMIS.Controllers
                 SenderId = currentUserId!,
                 RecipientId = dto.RecipientId,
                 Content = dto.Content.Trim(),
-                SentAt = DateTime.UtcNow
+                SentAt = DateTime.Now
             };
 
             _context.Messages.Add(message);
@@ -158,7 +158,7 @@ namespace AdamMIS.Controllers
 
             if (messages.Any())
             {
-                var readTime = DateTime.UtcNow;
+                    var readTime = DateTime.Now;
                 foreach (var message in messages)
                 {
                     message.IsRead = true;

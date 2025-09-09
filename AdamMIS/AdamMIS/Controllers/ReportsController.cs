@@ -325,40 +325,21 @@ namespace AdamMIS.Controllers
 
 
         [HttpPost("reports/{reportId}/generate")]
-        public async Task<IActionResult> GenerateReport(int reportId)
+        public async Task<IActionResult> ViewReport(int reportId)
         {
             try
             {
-                // Get the report from database
                 var report = await _reportService.GetReportByIdAsync(reportId);
                 if (report == null)
                     return NotFound(new { message = "Report not found." });
 
-                // Validate file exists
                 if (string.IsNullOrEmpty(report.FilePath) || !System.IO.File.Exists(report.FilePath))
                     return NotFound(new { message = "Report file not found." });
 
-                // Execute ReportGenerator
-                var exePath = Path.Combine("C:\\Program Files (x86)\\HospitalSystem", "ReportGenerator.exe");
+                // Instead of EXE, return a redirect (or a link) to the Web Viewer
+                var viewerUrl = $"http://192.168.1.203:8090/Viewer.aspx?={Uri.EscapeDataString(report.FilePath)}";
 
-                var psi = new ProcessStartInfo
-                {
-                    FileName = exePath,
-                    Arguments = $"\"{report.FilePath}\"",
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                };
-
-                using var process = Process.Start(psi);
-                if (process == null)
-                    return StatusCode(500, "Failed to start report generation.");
-
-                process.WaitForExit();
-
-                if (process.ExitCode != 0)
-                    return StatusCode(500, "Report generation failed.");
-
-                return Ok(new { message = "Report generated successfully.", reportId });
+                return Ok(new { message = "Report ready", reportId, viewerUrl });
             }
             catch (Exception ex)
             {
@@ -366,6 +347,7 @@ namespace AdamMIS.Controllers
                 return StatusCode(500, new { message = "An error occurred while generating the report." });
             }
         }
+
 
 
 
@@ -415,7 +397,7 @@ namespace AdamMIS.Controllers
                     reportId = reportId,
                     fileName = report.FileName,
                     filePath = originalFilePath,
-                    openedAt = DateTime.UtcNow
+                    openedAt = DateTime.Now
                 });
             }
             catch (Exception ex)

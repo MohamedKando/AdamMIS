@@ -25,8 +25,8 @@ namespace AdamMIS.Services.ReportsServices
 
 
 
-            // User Report Assignment
-            Task<IEnumerable<UserReportResponse>> AssignReportsToUsersAsync(UserReportRequest request, string assignedBy);
+        // User Report Assignment
+            Task<ReportAssignmentResult> AssignReportsToUsersAsync(UserReportRequest request, string assignedBy);
             Task<bool> RemoveUserReportAssignmentAsync(int userReportId);
             Task<IEnumerable<UserReportResponse>> GetUserReportsAsync(string userId);
             Task<IEnumerable<UserReportResponse>> GetReportUsersAsync(int reportId);

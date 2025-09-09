@@ -166,7 +166,7 @@ namespace AdamMIS.Services.UsersServices
                     RolesCount = request.Roles.Count(),
                     Roles = request.Roles.ToList(),
                     IsDisabled = user.IsDisabled,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.Now
                 })
             });
 
@@ -224,7 +224,7 @@ namespace AdamMIS.Services.UsersServices
                         IsDisabled = user.IsDisabled,
                         Title = user.Title,
                         Roles = userRoles.ToList(),
-                        UpdatedAt = DateTime.UtcNow
+                        UpdatedAt = DateTime.Now
                     })
                 });
 
@@ -286,7 +286,7 @@ namespace AdamMIS.Services.UsersServices
                     RolesCount = updatedRoles.Count,
                     RolesAdded = rolesToAdd,
                     RolesRemoved = rolesToRemove,
-                    UpdatedAt = DateTime.UtcNow
+                    UpdatedAt = DateTime.Now
                 })
             });
 
@@ -362,7 +362,7 @@ namespace AdamMIS.Services.UsersServices
             {
                 UserId = request.UserId,
                 Permission = permission,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.Now
             }).ToList();
 
             await _context.UserPermissions.AddRangeAsync(newPermissions);
@@ -382,7 +382,7 @@ namespace AdamMIS.Services.UsersServices
                     UserId = request.UserId,
                     UserName = user.UserName,
                     IndividualPermissions = request.Permissions,
-                    UpdatedAt = DateTime.UtcNow
+                    UpdatedAt = DateTime.Now
                 })
             });
 
@@ -447,7 +447,7 @@ namespace AdamMIS.Services.UsersServices
                 NewValues = JsonConvert.SerializeObject(new
                 {
                     UserName = user.UserName,
-                    PasswordChangedAt = DateTime.UtcNow,
+                    PasswordChangedAt = DateTime.Now,
                     ChangedBy = "Self"
                 })
             });
@@ -483,7 +483,7 @@ namespace AdamMIS.Services.UsersServices
                 NewValues = JsonConvert.SerializeObject(new
                 {
                     UserName = user.UserName,
-                    PasswordResetAt = DateTime.UtcNow,
+                    PasswordResetAt = DateTime.Now,
                     ResetBy = "Admin",
                     AdminUsername = GetCurrentUsername()
                 })
@@ -555,7 +555,7 @@ namespace AdamMIS.Services.UsersServices
                     DepartmentName = newDepartment?.Name ?? oldDepartment?.Name,
                     InternalPhone = user.InternalPhone,
                     UserPhone = user.PhoneNumber,
-                    UpdatedAt = DateTime.UtcNow
+                    UpdatedAt = DateTime.Now
                 })
             });
 
@@ -672,7 +672,7 @@ namespace AdamMIS.Services.UsersServices
                     AssignedUserId = request.UserId,
                     AssignedUserName = user.UserName,
                     NewHeadCount = currentHeads.Count + 1,
-                    AssignedAt = DateTime.UtcNow,
+                    AssignedAt = DateTime.Now,
                     AssignedBy = GetCurrentUsername()
                 })
             });
@@ -730,7 +730,7 @@ namespace AdamMIS.Services.UsersServices
                     RemovedUserId = request.UserId,
                     RemovedUserName = user.UserName,
                     NewHeadCount = currentHeads.Count - 1,
-                    RemovedAt = DateTime.UtcNow,
+                    RemovedAt = DateTime.Now,
                     RemovedBy = GetCurrentUsername()
                 })
             });

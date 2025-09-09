@@ -89,7 +89,7 @@ namespace AdamMIS.Services.ReportsServices
                     Name = category.Name,
                     Description = category.Description,
                     Color = category.Color,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.Now
                 })
             });
 
@@ -147,7 +147,7 @@ namespace AdamMIS.Services.ReportsServices
                     Name = category.Name,
                     Description = category.Description,
                     Color = category.Color,
-                    UpdatedAt = DateTime.UtcNow
+                    UpdatedAt = DateTime.Now
                 })
             });
 
@@ -298,7 +298,7 @@ namespace AdamMIS.Services.ReportsServices
                 FileName = request.File.FileName,
                 FilePath = filePath,
                 CategoryId = request.CategoryId,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
                 CreatedBy = createdBy,
                 IsActive = true
             };
@@ -430,7 +430,7 @@ namespace AdamMIS.Services.ReportsServices
                         {
                             FileName = report.FileName,
                             FilePath = report.FilePath,
-                            AccessedAt = DateTime.UtcNow,
+                            AccessedAt = DateTime.Now,
                             FileSizeBytes = fileBytes.Length
                         })
                     });
@@ -485,7 +485,7 @@ namespace AdamMIS.Services.ReportsServices
                         {
                             FileName = report.FileName,
                             FilePath = report.FilePath,
-                            AccessedAt = DateTime.UtcNow
+                            AccessedAt = DateTime.Now
                         })
                     });
 
@@ -606,17 +606,29 @@ namespace AdamMIS.Services.ReportsServices
             return allUserReports;
         }
 
-        public async Task<IEnumerable<UserReportResponse>> AssignReportsToUsersAsync(UserReportRequest request, string assignedBy)
+        public async Task<ReportAssignmentResult> AssignReportsToUsersAsync(UserReportRequest request, string assignedBy)
         {
             try
             {
                 var userReports = new List<UserReports>();
                 var responses = new List<UserReportResponse>();
+                var duplicateAssignments = new List<DuplicateReportAssignment>();
 
                 foreach (var userId in request.UserIds)
                 {
+                    // Get user name for better error messages
+                    var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                    var userName = user?.UserName ?? userId;
+
                     foreach (var reportId in request.ReportIds)
                     {
+                        // Get report name for better error messages
+                        var report = await _context.Reports
+                            .Include(r => r.Category)
+                            .FirstOrDefaultAsync(r => r.Id == reportId);
+                        var reportFileName = report?.FileName ?? "Unknown Report";
+                        var categoryName = report?.Category?.Name ?? "Unknown Category";
+
                         // Check if assignment already exists
                         var existingAssignment = await _context.UserReports
                             .FirstOrDefaultAsync(ur => ur.UserId == userId && ur.ReportId == reportId);
@@ -627,11 +639,25 @@ namespace AdamMIS.Services.ReportsServices
                             {
                                 UserId = userId,
                                 ReportId = reportId,
-                                AssignedAt = DateTime.UtcNow,
+                                AssignedAt = DateTime.Now,
                                 AssignedBy = assignedBy
                             };
 
                             userReports.Add(userReport);
+                        }
+                        else
+                        {
+                            // Track duplicate assignments
+                            duplicateAssignments.Add(new DuplicateReportAssignment
+                            {
+                                UserId = userId,
+                                UserName = userName,
+                                ReportId = reportId,
+                                ReportFileName = reportFileName,
+                                CategoryName = categoryName,
+                                ExistingAssignedAt = existingAssignment.AssignedAt,
+                                ExistingAssignedBy = existingAssignment.AssignedBy
+                            });
                         }
                     }
                 }
@@ -704,13 +730,20 @@ namespace AdamMIS.Services.ReportsServices
                                 UniqueUsers = uniqueUsers,
                                 UniqueReports = uniqueReports,
                                 AssignedBy = assignedBy,
-                                AssignedAt = DateTime.UtcNow
+                                AssignedAt = DateTime.Now
                             })
                         });
                     }
                 }
 
-                return responses;
+                return new ReportAssignmentResult
+                {
+                    NewAssignments = responses,
+                    DuplicateAssignments = duplicateAssignments,
+                    TotalRequested = request.UserIds.Count * request.ReportIds.Count,
+                    SuccessfulAssignments = responses.Count,
+                    DuplicateCount = duplicateAssignments.Count
+                };
             }
             catch (Exception ex)
             {
@@ -718,6 +751,7 @@ namespace AdamMIS.Services.ReportsServices
                 throw;
             }
         }
+
 
         public async Task<bool> RemoveUserReportAssignmentAsync(int userReportId)
         {
@@ -795,7 +829,7 @@ namespace AdamMIS.Services.ReportsServices
                     {
                         TotalReportsDeleted = reports.Count,
                         NetworkPath = _reportsPath,
-                        DeletedAt = DateTime.UtcNow
+                        DeletedAt = DateTime.Now
                     }),
                     NewValues = null
                 });

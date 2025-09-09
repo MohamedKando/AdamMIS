@@ -57,7 +57,7 @@ namespace AdamMIS.Services.Implementations
                     Url = request.Url,
                     Title = request.Title,
                     Description = request.Description,
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTime.Now,
                     CreatedBy = createdBy
                 };
 
@@ -290,17 +290,27 @@ namespace AdamMIS.Services.Implementations
                 return allAssignments;
             }
 
-            public async Task<IEnumerable<UserMetabaseResponse>> AssignUrlsToUsersAsync(UserMetabaseRequest request, string assignedBy)
+
+            public async Task<AssignmentResult> AssignUrlsToUsersAsync(UserMetabaseRequest request, string assignedBy)
             {
                 try
                 {
                     var userMetabases = new List<UsersMetabases>();
                     var responses = new List<UserMetabaseResponse>();
+                    var duplicateAssignments = new List<DuplicateAssignment>();
 
                     foreach (var userId in request.UserIds)
                     {
+                        // Get user name for better error messages
+                        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                        var userName = user?.UserName ?? userId;
+
                         foreach (var metabaseId in request.MetabaseIds)
                         {
+                            // Get URL title for better error messages
+                            var metabase = await _context.Metabases.FirstOrDefaultAsync(m => m.Id == metabaseId);
+                            var metabaseTitle = metabase?.Title ?? "Unknown URL";
+
                             // Check if assignment already exists
                             var existingAssignment = await _context.UsersMetabases
                                 .FirstOrDefaultAsync(um => um.UserId == userId && um.MetabaseId == metabaseId);
@@ -311,11 +321,24 @@ namespace AdamMIS.Services.Implementations
                                 {
                                     UserId = userId,
                                     MetabaseId = metabaseId,
-                                    AssignedAt = DateTime.UtcNow,
+                                    AssignedAt = DateTime.Now,
                                     AssignedBy = assignedBy
                                 };
 
                                 userMetabases.Add(userMetabase);
+                            }
+                            else
+                            {
+                                // Track duplicate assignments
+                                duplicateAssignments.Add(new DuplicateAssignment
+                                {
+                                    UserId = userId,
+                                    UserName = userName,
+                                    MetabaseId = metabaseId,
+                                    MetabaseTitle = metabaseTitle,
+                                    ExistingAssignedAt = existingAssignment.AssignedAt,
+                                    ExistingAssignedBy = existingAssignment.AssignedBy
+                                });
                             }
                         }
                     }
@@ -341,7 +364,7 @@ namespace AdamMIS.Services.Implementations
                                 MetabaseUrl = um.MetaBase.Url,
                                 AssignedAt = um.AssignedAt,
                                 AssignedBy = um.AssignedBy,
-                                Description=um.Description
+                                Description = um.Description
                             })
                             .ToListAsync();
 
@@ -387,13 +410,20 @@ namespace AdamMIS.Services.Implementations
                                     UniqueUsers = uniqueUsers,
                                     UniqueUrls = uniqueUrls,
                                     AssignedBy = assignedBy,
-                                    AssignedAt = DateTime.UtcNow
+                                    AssignedAt = DateTime.Now
                                 })
                             });
                         }
                     }
 
-                    return responses;
+                    return new AssignmentResult
+                    {
+                        NewAssignments = responses,
+                        DuplicateAssignments = duplicateAssignments,
+                        TotalRequested = request.UserIds.Count * request.MetabaseIds.Count,
+                        SuccessfulAssignments = responses.Count,
+                        DuplicateCount = duplicateAssignments.Count
+                    };
                 }
                 catch (Exception ex)
                 {

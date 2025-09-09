@@ -39,8 +39,8 @@ namespace AdamMIS.Services.EmployeeServices
                 Status = "Draft",
 
                 // Audit
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
                 CreatedBy = createdBy
             };
 
@@ -63,11 +63,11 @@ namespace AdamMIS.Services.EmployeeServices
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.UserIsNotHr);
 
             // Mark HR step as completed
-            employee.HRCompletedAt = DateTime.UtcNow;
+            employee.HRCompletedAt = DateTime.Now;
             employee.HRCompletedBy = userId;
             employee.CurrentStep = "DepartmentHead";
             employee.Status = "InProgress";
-            employee.UpdatedAt = DateTime.UtcNow;
+            employee.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
 
@@ -113,7 +113,7 @@ namespace AdamMIS.Services.EmployeeServices
 
             // Update system permissions
             employee.SystemPermissions = request.SystemPermissions;
-            employee.UpdatedAt = DateTime.UtcNow;
+            employee.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
 
@@ -135,10 +135,10 @@ namespace AdamMIS.Services.EmployeeServices
             if (!employee.Department.Heads.Any(h => h.HeadId == userId))
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.UserIsNotDepartmentHead);
 
-            employee.DepartmentCompletedAt = DateTime.UtcNow;
+            employee.DepartmentCompletedAt = DateTime.Now;
             employee.DepartmentCompletedBy = userId;
             employee.CurrentStep = "IT";
-            employee.UpdatedAt = DateTime.UtcNow;
+            employee.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
             var response = MapToResponse(employee);
@@ -161,7 +161,7 @@ namespace AdamMIS.Services.EmployeeServices
             employee.FilesSharing = request.FilesSharing;
             employee.NetworkId = request.NetworkId;
             employee.EmailId = request.EmailId;
-            employee.UpdatedAt = DateTime.UtcNow;
+            employee.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
             var response = MapToResponse(employee);
@@ -177,10 +177,10 @@ namespace AdamMIS.Services.EmployeeServices
             if (!await IsUserITHeadAsync(userId))
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.UserIsNotITtHead);
 
-            employee.ITCompletedAt = DateTime.UtcNow;
+            employee.ITCompletedAt = DateTime.Now;
             employee.ITCompletedBy = userId;
             employee.CurrentStep = "CEO";
-            employee.UpdatedAt = DateTime.UtcNow;
+            employee.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
             var response = MapToResponse(employee);
@@ -198,7 +198,7 @@ namespace AdamMIS.Services.EmployeeServices
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.UserIsNotCEO);
 
             employee.CEOSignature = request.CEOSignature;
-            employee.UpdatedAt = DateTime.UtcNow;
+            employee.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
             var response = MapToResponse(employee);
@@ -214,11 +214,11 @@ namespace AdamMIS.Services.EmployeeServices
             if (!await IsUserCEOAsync(userId))
                 return Result.Failure<EmployeeResponse>(EmployeeErrors.UserIsNotCEO);
 
-            employee.CEOCompletedAt = DateTime.UtcNow;
+            employee.CEOCompletedAt = DateTime.Now;
             employee.CEOCompletedBy = userId;
             employee.CurrentStep = "Completed";
             employee.Status = "Approved";
-            employee.UpdatedAt = DateTime.UtcNow;
+            employee.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
             var response = MapToResponse(employee);

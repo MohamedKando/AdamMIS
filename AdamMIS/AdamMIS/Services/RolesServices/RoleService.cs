@@ -108,7 +108,7 @@ namespace AdamMIS.Services.RolesServices
                         IsDefault = false,
                         PermissionsCount = request.Permissions.Count(),
                         Permissions = request.Permissions.ToList(),
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.Now
                     })
                 });
 
@@ -194,7 +194,7 @@ namespace AdamMIS.Services.RolesServices
                         Permissions = request.Permissions.ToList(),
                         AddedPermissions = newPermissions.Select(x => x.ClaimValue).ToList(),
                         RemovedPermissions = removedPermissions.ToList(),
-                        UpdatedAt = DateTime.UtcNow
+                        UpdatedAt = DateTime.Now
                     })
                 });
 
@@ -252,7 +252,7 @@ namespace AdamMIS.Services.RolesServices
                     RoleName = role.Name,
                     IsDeleted = role.IsDeleted,
                     UsersRemovedCount = role.IsDeleted ? usersWithRole.Count : 0,
-                    UpdatedAt = DateTime.UtcNow
+                    UpdatedAt = DateTime.Now
                 })
             });
 

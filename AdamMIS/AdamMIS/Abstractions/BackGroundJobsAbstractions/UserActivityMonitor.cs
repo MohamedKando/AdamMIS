@@ -17,7 +17,7 @@
                 using var scope = _serviceProvider.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-                var now = DateTime.UtcNow;
+                var now = DateTime.Now;
 
                 // Assume JWT expires in 15 min from last activity
                 var expiredUsers = context.acivityLogs
