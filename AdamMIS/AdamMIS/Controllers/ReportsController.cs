@@ -337,7 +337,7 @@ namespace AdamMIS.Controllers
                     return NotFound(new { message = "Report file not found." });
 
                 // Instead of EXE, return a redirect (or a link) to the Web Viewer
-                var viewerUrl = $"http://192.168.1.203:8090/Viewer.aspx?={Uri.EscapeDataString(report.FilePath)}";
+                var viewerUrl = $"http://192.168.1.203:8090/Viewer.aspx?path={Uri.EscapeDataString(report.FilePath)}";
 
                 return Ok(new { message = "Report ready", reportId, viewerUrl });
             }
